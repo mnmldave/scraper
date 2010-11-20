@@ -40,22 +40,24 @@ bit155.scraper = bit155.scraper || {};
 /**
  * Generates bit155.scraper.scrape options for the given selection. Uses magic
  * to try and guess reasonable defaults.
+ *
+ * @param focusNode {node} same semantics as Selection.focusNode
+ * @param anchorNode {node} (optional) same as Selection.anchorNode
  */
-bit155.scraper.optionsForSelection = function(selection) {
+bit155.scraper.optionsForSelection = function(focusNode, anchorNode) {
   var options = {}, ancestor, ancestorTagName, ancestorClassName, node;
   
   // determine common ancestor based on selection
-  selection = selection || window.getSelection();
-  if (selection.isCollapsed) {
-    ancestor = $(selection.focusNode).parent();
+  if (anchorNode) {
+    ancestor = $([focusNode, anchorNode]).commonAncestor();
   } else {
-    ancestor = $([selection.focusNode, selection.anchorNode]).commonAncestor();
+    ancestor = $(focusNode).closest('*');
   }
   
   // if ancestor is a table (or tbody, thead or tfoot), perhaps they were 
   // trying to capture the rows instead
   if (ancestor.get(0) && (ancestor.get(0).tagName === 'TABLE' || ancestor.get(0).tagName === 'TBODY' || ancestor.get(0).tagName === 'THEAD' || ancestor.get(0).tagName === 'TFOOT')) {
-    ancestor = $(selection.focusNode).closest('tr');
+    ancestor = $(focusNode).closest('tr');
     // TODO don't do this if they selected the *entire* table
   }
   

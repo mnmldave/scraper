@@ -114,8 +114,8 @@ var menu = chrome.contextMenus.create({
           + "?tab=" + tab.id
           + "&options=" + encodeURIComponent(JSON.stringify(response)),
         type: 'popup',
-        width: 960,
-        height: 400
+        width: parseInt((localStorage['viewer.width'] || '960'), 10),
+        height: parseInt((localStorage['viewer.height'] || '400'), 10)
       });
     });
   }

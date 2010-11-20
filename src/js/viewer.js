@@ -332,6 +332,8 @@ $(function() {
       options.filters = [];
     }
     localStorage['viewer.options'] = JSON.stringify(options);
+    localStorage['viewer.width'] = window.outerWidth;
+    localStorage['viewer.height'] = window.outerHeight;
   }, true);
 
   // layout view

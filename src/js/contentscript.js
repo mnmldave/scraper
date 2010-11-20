@@ -34,41 +34,61 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// listen for requests
-chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
-  var command = request.command;
-  var payload = request.payload;
-  var response = $.extend({}, payload);
+(function(){
+  // listen for context menu
+  var contextNode;
+  addEventListener("contextmenu", function(e) {
+    contextNode = e.srcElement;
+  });
   
-  try {
-    if (command === 'scraperScrape') {
-      // scrape
-      response.result = bit155.scraper.scrape(response);
-    } else if (command === 'scraperSelect') {
-      // select
-      response = $.extend(response, bit155.scraper.optionsForSelection(window.getSelection()));
-    } else if (command === 'scraperHighlight') {
-      // highlight
-      var elements;
-      
-      if (payload.selector) {
-        elements = bit155.scraper.select(document, payload.selector, payload.language);
-      } else if (payload.xpath) {
-        elements = bit155.scraper.select(document, payload.xpath, 'xpath');
-      } else if (payload.jquery) {
-        elements = $(payload.jquery);
-      }
-      
-      if (elements) {
-        $.scrollTo(elements.filter(':visible').effect('highlight', {}, 'slow'));
-      }
-    } else {
-      throw new Error('Unsupported request: ' + JSON.stringify(request));
-    }
-  } catch (error) {
-    console.error(error);
-    response.error = error;
-  }
+  // listen for requests
+  chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
+    var command = request.command;
+    var payload = request.payload;
+    var response = $.extend({}, payload);
 
-  sendResponse(response);
-});
+    try {
+      if (command === 'scraperScrape') {
+        // scrape
+        response.result = bit155.scraper.scrape(response);
+      } else if (command === 'scraperSelect') {
+        // select
+        (function(){
+          var focusNode, anchorNode;
+          var selection = window.getSelection();
+
+          if (selection.isCollapsed) {
+            focusNode = contextNode;
+          } else {
+            focusNode = selection.focusNode;
+            anchorNode = selection.anchorNode;
+          }
+
+          response = $.extend(response, bit155.scraper.optionsForSelection(focusNode, anchorNode));
+        }());
+      } else if (command === 'scraperHighlight') {
+        // highlight
+        var elements;
+
+        if (payload.selector) {
+          elements = bit155.scraper.select(document, payload.selector, payload.language);
+        } else if (payload.xpath) {
+          elements = bit155.scraper.select(document, payload.xpath, 'xpath');
+        } else if (payload.jquery) {
+          elements = $(payload.jquery);
+        }
+
+        if (elements) {
+          $.scrollTo(elements.filter(':visible').effect('highlight', {}, 'slow'));
+        }
+      } else {
+        throw new Error('Unsupported request: ' + JSON.stringify(request));
+      }
+    } catch (error) {
+      console.error(error);
+      response.error = error;
+    }
+
+    sendResponse(response);
+  });  
+}());

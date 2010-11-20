@@ -34,7 +34,7 @@ div.error.ui-dialog-content.ui-widget-content {
 #options {
   -webkit-user-select: none;
 } 
- 
+
   #options-center {
     background-color: #ededed !important;
     border-bottom: 1px solid #aaa !important;
@@ -48,7 +48,7 @@ div.error.ui-dialog-content.ui-widget-content {
     border-top: 1px solid #ccc;
     padding: 10px;
   }
-  
+
   #options fieldset legend {
     font-weight: bold;
     color: #333;
@@ -61,18 +61,18 @@ div.error.ui-dialog-content.ui-widget-content {
     padding: 0;
     width: 100%;
   }
-  
+
     #options-head td {
       padding: 5px;
     }
-  
+
     #options-head input[type=text] {
       border: 1px solid #999;
       border-radius: 5px;
       -webkit-box-shadow: inset 1px 2px 3px rgba(0,0,0,0.2);
       padding: 5px 5px;
     }
-  
+
   #options-selector {
     width: 100%;
   }
@@ -83,7 +83,7 @@ div.error.ui-dialog-content.ui-widget-content {
     background: -webkit-gradient(linear, left bottom, left top, color-stop(0.1, #ccc), color-stop(0.8, #eee));
     padding: 10px;
   }
-  
+
     #options-footer table {
       width: 100%;
       margin: 0;
@@ -91,13 +91,13 @@ div.error.ui-dialog-content.ui-widget-content {
       border: 0;
       border-collapse: collapse;
     }
-    
+  
       #options-footer table td {
         margin: 0;
         padding: 0;
         text-align: right;
       }
-  
+
       #options-footer table td:first-child {
         text-align: left;
       }
@@ -107,15 +107,15 @@ div.error.ui-dialog-content.ui-widget-content {
     border-collapse: collapse;
     border-spacing: 0;
   }
-  
+
   #options-attributes tbody td {
     padding: 4px;
   }
-  
+
   #options-attributes thead tr {
     border: 1px solid #ccc;
   }
-  
+
   #options-attributes thead th {
     background: -webkit-gradient(linear, left bottom, left top, color-stop(0.1, #ccc), color-stop(0.8, #eee));
     border: none;
@@ -124,7 +124,7 @@ div.error.ui-dialog-content.ui-widget-content {
     text-align: left;
     text-shadow: 0 1px rgba(255,255,255,0.9);
   }
-  
+
   #options-attributes .dragHandle {
     width: 16px;
     cursor: move;
@@ -132,7 +132,7 @@ div.error.ui-dialog-content.ui-widget-content {
     background-position: left center;
     background-repeat: no-repeat;
   }
-  
+
   #options-attributes tr.tDnD_whileDrag {
     opacity: 0.5;
   }
@@ -141,7 +141,7 @@ div.error.ui-dialog-content.ui-widget-content {
     background-position: left center;
     background-repeat: no-repeat;
   }
-  
+
   #options-attributes input {
     width: 100%;
     border: none;
@@ -151,13 +151,13 @@ div.error.ui-dialog-content.ui-widget-content {
     background: transparent;
     padding: 4px 2px;
   }
-  
+
   #options-attributes input:focus {
     border: 1px solid #aaa;
     padding: 3px 1px;
     background-color: #fff;
   }
-  
+
   #options-attributes img {
     margin-right: 5px;
   }
@@ -175,19 +175,19 @@ div.error.ui-dialog-content.ui-widget-content {
     width: 100%;
     border-spacing: 0;
   }
-  
+
   #results-table table thead {
     border-bottom: 1px solid #aaa;
     background: -webkit-gradient(linear, left bottom, left top, color-stop(0.1, #ccc), color-stop(0.8, #eee));
     color: #333;
     text-shadow: 0 1px rgba(255,255,255,0.9);
   }
-  
+
   #results-table table thead tr {
     position: relative;
     top: 0;
   }
-  
+
   #results-table table thead th {
     padding: 5px;
     border-left: 1px solid #fff;
@@ -195,7 +195,7 @@ div.error.ui-dialog-content.ui-widget-content {
     border-bottom: 1px solid #aaa;
     cursor: pointer;
   }
-  
+
   #results-table table td {
     padding: 5px;
   }
@@ -204,7 +204,7 @@ div.error.ui-dialog-content.ui-widget-content {
     margin-right: 2px;
     cursor: pointer;
   }
-  
+
   #results-table table tr.odd {
     background-color: #f0f0f0;
   }
@@ -212,7 +212,7 @@ div.error.ui-dialog-content.ui-widget-content {
   #results-table table tr:hover td {
     background-color: #f5f5ff;
   }
-  
+
   #export {
     border-top: 1px solid #fff !important;
     background: -webkit-gradient(linear, left bottom, left top, color-stop(0.1, #ccc), color-stop(0.8, #eee));
@@ -220,7 +220,7 @@ div.error.ui-dialog-content.ui-widget-content {
     text-align: right;
     height: 30px;
   }
-  
+
     #export textarea {
       display: none;
     }
