@@ -26,12 +26,12 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-require 'crxmake'
 require 'json'
 require 'yui/compressor'
 require 'closure-compiler'
 
-PKEY = File.join(File.dirname(__FILE__), "src.pem")
+# Metadata
+# --------------------------------------------------------------------------
 
 manifest = open(File.join('src', 'manifest.json')) do |file|
   JSON.load(file)
@@ -40,36 +40,24 @@ end
 name = manifest['name']
 version = manifest['version']
 
-task :default => :zip
 
-desc 'packages the extension as a crx'
-task :crx => :build do
-  CrxMake.make(
-    :ex_dir => File.join('target', 'build'),
-    :pkey   => PKEY,
-    :crx_output => File.join('target', "#{name}-#{version}.crx"),
-    :verbose => true,
-    :ignorefile => /\.swp/,
-    :ignoredir => /\.(?:svn|git|cvs)/
-  )
+# Building
+# --------------------------------------------------------------------------
+
+build_dir = 'build'
+
+desc 'Rebuilds the extension'
+task :rebuild => [:clobber_build, :build]
+
+desc 'Removes build artifacts'
+task :clobber_build do
+  rmtree build_dir rescue nil
 end
 
-desc 'packages the extension as a zip'
-task :zip => :build do
-  CrxMake.zip(
-    :ex_dir => File.join('target', 'build'),
-    :pkey   => PKEY,
-    :zip_output => File.join('target', "#{name}-#{version}.zip"),
-    :verbose => true,
-    :ignorefile => /\.swp/,
-    :ignoredir => /\.(?:svn|git|cvs)/
-  )
-end
-
-desc 'builds the extension'
-file :build => 'target/build' do
+desc 'Builds the extension'
+file build_dir do
   source_files = Dir.glob(File.join('src', '**'))
-  build_dir = File.join('target', 'build')
+  mkdir_p build_dir rescue nil
   cp_r source_files, build_dir
   
   # compress css
@@ -81,12 +69,61 @@ file :build => 'target/build' do
   end
   
   # compress javascript
+  compiler = Closure::Compiler.new
   Dir.glob(File.join(build_dir, '**', '*.js')) do |path|
     puts 'Compiling: ' + path
-    js = Closure::Compiler.new.compile(File.read(path))
-    File.open(path, 'w') { |file| file.write(js) }
+    begin
+      js = compiler.compile(File.read(path))
+      File.open(path, 'w') { |file| file.write(js) }
+    rescue
+      print 'Failed: ', $!, "\n"
+    end
   end
 end
 
-directory 'target'
-directory 'target/build'
+# Packaging
+# --------------------------------------------------------------------------
+
+package_name = "#{name}-#{version}"
+package_dir = 'pkg'
+package_dir_path = File.join(package_dir, package_name)
+zip_file = "#{package_name}.zip"
+
+# most of this packaging stuff right from rake/packagetask
+desc 'Packages the extension'
+task :package => ["#{package_dir}/#{zip_file}"]
+file "#{package_dir}/#{zip_file}" => package_dir_path do
+  chdir(package_dir) do
+    sh %{zip -r #{zip_file} #{package_name}}
+  end
+end
+
+directory package_dir
+
+file package_dir_path => build_dir do
+  chdir(build_dir) do
+    mkdir_p package_dir rescue nil
+    Dir.glob('**/*').each do |fn|
+      f = File.join(File.dirname(__FILE__), package_dir_path, fn)
+      fdir = File.dirname(f)
+      mkdir_p(fdir) if !File.exist?(fdir)
+      if File.directory?(fn)
+        mkdir_p(f)
+      else
+        rm_f f
+        safe_ln(fn, f)
+      end
+    end
+  end
+end
+
+desc 'Removes the package artifacts'
+task :clobber_package do
+  rmtree package_dir rescue nil
+end
+
+desc 'Repackages the extension'
+task :repackage => [:clobber_package, :package]
+
+desc 'Removes all rake artifacts'
+task :clobber => [:clobber_package, :clobber_build]

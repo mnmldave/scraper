@@ -1,4 +1,5 @@
 syntax:glob
+build
 *.pem
 .DS_Store
 target

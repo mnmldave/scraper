@@ -84,3 +84,18 @@ bit155.csv.row = function() {
   }
   return text;
 };
+
+bit155.csv.csv = function(data) {
+  var text = '';
+  var i;
+  
+  if (!$.isArray(data)) {
+    return "";
+  }
+  
+  for (i = 0; i < data.length; i++) {
+    text += bit155.csv.row(data[i]) + '\n';
+  }
+  
+  return text;
+};

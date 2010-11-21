@@ -143,28 +143,22 @@
  * Returns the xpath of an element.
  */
 (function($){
-  var _xpathIndexOf = function(el) {
-    var index = 1;
-    for (var sib = el.previousSibling; sib ; sib = sib.previousSibling) {
-      if (sib.nodeType === 1 && sib.tagName === el.tagName)	{
-        index++;
-      }
-    }
-    return index;
-  };
-  
   $.fn.xpath = function(options) {
-    var elt = this.get(0);
+    var node;
     var path = "";
-    var idx, xname;
+    var tag, segment, siblings;
     
-    for (; elt && elt.nodeType == 1; elt = elt.parentNode) {
-      idx = _xpathIndexOf(elt);
-      xname = elt.tagName.toLowerCase();
-    	if (idx > 1) {
-    	  xname += "[" + idx + "]";
-  	  }
-      path = "/" + xname + path;
+    for (node = this.get(0); node && node.nodeType == 1; node = node.parentNode) {
+      tag = node.tagName.toLowerCase();
+      segment = tag;
+      
+      // append index
+      siblings = $(node).parent().children(tag);
+      if (siblings.length > 1) {
+        path = "/" + tag + "[" + (siblings.index(node) + 1) + "]" + path;
+      } else {
+        path = "/" + tag + path;
+      }
     }
     
     return path;	

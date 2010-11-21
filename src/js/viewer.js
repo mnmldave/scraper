@@ -38,7 +38,7 @@
  * Sort of a controller class for the viewer and work-in-progress towards a
  * real architecture. Mostly so I can test some of the logic in it.
  */
-Viewer = function() {};
+var Viewer = function() {};
 
 /**
  * Contains the scrape data.
@@ -226,7 +226,7 @@ Viewer.prototype.reload = function() {
 };
 
 /**
- * Scrapes the host document given the current options.
+ * Scrapes the host document using the current options.
  */
 Viewer.prototype.scrape = function() {
   var self = this;
@@ -252,33 +252,26 @@ Viewer.prototype.scrape = function() {
 };
 
 /**
- * Returns the current data in CSV format.
- */
-Viewer.prototype.csv = function() {
-  var results = this.data().result || [];
-  var attributes = $.map(this.data().attributes || [], function(a) { return a.name || a.xpath; });
-  var text = '';
-  var i;
-  
-  text += bit155.csv.row(attributes) + '\n';
-  for (i = 0; i < results.length; i++) {
-    text += bit155.csv.row(results[i].values);
-    text += '\n';
-  }
-  
-  return text;
-};
-
-/**
  * Creates a Google spreadsheet with the current data.
  */
 Viewer.prototype.spreadsheet = function() {
   var self = this;
+  var data = [];
+  var csv;
   
+  // gather up data and convert to csv
+  data.push($.map(this.data().attributes || [], function(a) { return a.name || a.xpath; }));
+  $.each(this.data().result || [], function(index, result) {
+    data.push(result.values);
+  });
+  csv = bit155.csv.csv(data);
+
+  // find the host tab so we can get its title
   chrome.tabs.get(self.tabId(), function(tab) {
     var request = {};
     var dialog = $('<div>').addClass('progress');
     
+    // tell user to wait
     dialog.append($('<div style="margin: 30px; text-align: center"><img src="img/progress.gif"></div>'));
     dialog.dialog({
       closeOnEscape: true,
@@ -288,12 +281,12 @@ Viewer.prototype.spreadsheet = function() {
       modal: true
     });
     
+    // send spreadsheet request to background.js
     request.command = 'scraperSpreadsheet';
     request.payload = {
       title: tab.title || 'Scraped Data',
-      csv: self.csv()
+      csv: csv
     };
-        
     chrome.extension.sendRequest(request, function(response) {
       dialog.dialog('close');
     });
@@ -325,19 +318,8 @@ $(function() {
   viewer.tabId(queryTabId);
   viewer.options(options);
   
-  // save options on close
-  addEventListener("unload", function(event) {
-    var options = viewer.options();
-    if (!options.filters) {
-      options.filters = [];
-    }
-    localStorage['viewer.options'] = JSON.stringify(options);
-    localStorage['viewer.width'] = window.outerWidth;
-    localStorage['viewer.height'] = window.outerHeight;
-  }, true);
-
   // layout view
-  $('body').layout({ 
+  var layout = $('body').layout({ 
     west: {
       size: 340,
       minSize: 250,
@@ -346,6 +328,12 @@ $(function() {
       slidable: false
     }
   });
+  if (localStorage['viewer.west.size']) {
+    layout.sizePane('west', localStorage['viewer.west.size']);
+  }
+  if (localStorage['viewer.west.closed'] == 'true') {
+    layout.close('west');
+  }
   $('#bottom').accordion({
     collapsible: true,
     active: false,
@@ -375,8 +363,21 @@ $(function() {
 	  }
 	});
 	
-	// scrape for the first time
+  // scrape for the first time
 	viewer.scrape();
+	
+	// save options on close
+  addEventListener("unload", function(event) {
+    var options = viewer.options();
+    if (!options.filters) {
+      options.filters = [];
+    }
+    localStorage['viewer.options'] = JSON.stringify(options);
+    localStorage['viewer.width'] = window.outerWidth;
+    localStorage['viewer.height'] = window.outerHeight;
+    localStorage['viewer.west.size'] = layout.state.west.size;
+    localStorage['viewer.west.closed'] = layout.state.west.isClosed;
+  }, true);
 	
 	// give selectorinput focus
 	$('#options-selector').select().focus();

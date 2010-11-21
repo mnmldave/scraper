@@ -47,18 +47,17 @@ bit155.scraper = bit155.scraper || {};
 bit155.scraper.optionsForSelection = function(focusNode, anchorNode) {
   var options = {}, ancestor, ancestorTagName, ancestorClassName, node;
   
-  // determine common ancestor based on selection
+  // determine common ancestor based on user's current selection
   if (anchorNode) {
     ancestor = $([focusNode, anchorNode]).commonAncestor();
   } else {
     ancestor = $(focusNode).closest('*');
   }
   
-  // if ancestor is a table (or tbody, thead or tfoot), perhaps they were 
-  // trying to capture the rows instead
+  // if ancestor is a table (or tbody, thead or tfoot), assume user was 
+  // trying to capture the rows of the table.
   if (ancestor.get(0) && (ancestor.get(0).tagName === 'TABLE' || ancestor.get(0).tagName === 'TBODY' || ancestor.get(0).tagName === 'THEAD' || ancestor.get(0).tagName === 'TFOOT')) {
     ancestor = $(focusNode).closest('tr');
-    // TODO don't do this if they selected the *entire* table
   }
   
   // populate options
@@ -71,20 +70,42 @@ bit155.scraper.optionsForSelection = function(focusNode, anchorNode) {
     ancestorClassName = $.trim(node.className);
     options.selector = ancestorTagName;
     
-    // if the node has classes, use those as basis of selector, otherwise
-    // use ancestry
+    // find first xpath that matches more than one element by removing the
+    // index selector from each xpath segment. biggest caveats:
+    //
+    //  * only selecting elements with same structure
+    //  * won't work when selecting an outlier with deeper structure than peers
+    //  * ignores semantics
+    //
     options.language = 'xpath';
-    options.selector = $(node).parent().xpath() + "/" + node.tagName.toLowerCase();
+    options.selector = (function() {
+      var xpathRegex = /^(.*)(\[\d+\])([^\[\]]*)$/;
+      var xpath = $(node).xpath();
+      var result;
+      
+      // keep cutting out the last "[n]" specifier until we match more than
+      // one element
+      while ((result = xpathRegex.exec(xpath))) {
+        if (bit155.scraper.select(document, xpath, 'xpath').length > 1) {
+          break;
+        }
+        xpath = result[1] + result[3];
+      }
+      
+      return xpath;
+    }()) || '';
     
-    // use magical attributes
+    // use "magical" attributes depending on what custom ancestor is
     if (ancestorTagName === 'tr') {
-      $.each((function() {
-        // find headers
+      var headers = (function() {
         var table = ancestor.closest('table');
         var columns = ancestor.children().length;
         var firstRow = table.find('tr').first();
         var headerRow;
                 
+        // find first row in the table, and if it contains the same number of
+        // TH cells as data cells in our TR ancestor, then assume it contains
+        // column names
         if (firstRow && firstRow.children('th').length == columns) {
           headerRow = firstRow;
         } else {
@@ -98,36 +119,20 @@ bit155.scraper.optionsForSelection = function(focusNode, anchorNode) {
             return 'Column ' + (index + 1);
           }
         });
-      })(), function(index,name) {
-        // create attribute for each header
-        options.attributes.push({
-          xpath: '*[' + (index + 1) + ']',
-          name: name
-        });
+      })();
+      
+      // create an attribute for each header
+      $.each(headers, function(index,name) {
+        options.attributes.push({ xpath: '*[' + (index + 1) + ']', name: name });
       });
     } else if (ancestorTagName === 'a') {
-      options.attributes.push({
-        xpath: '.',
-        name: 'Link'
-      });
-      options.attributes.push({
-        xpath: '@href',
-        name: 'URL'
-      });
+      options.attributes.push({ xpath: '.', name: 'Link' });
+      options.attributes.push({ xpath: '@href', name: 'URL' });
     } else if (ancestorTagName === 'img') {
-      options.attributes.push({
-        xpath: '@title',
-        name: 'Title'
-      });
-      options.attributes.push({
-        xpath: '@src',
-        name: 'Source'
-      });
+      options.attributes.push({ xpath: '@title', name: 'Title' });
+      options.attributes.push({ xpath: '@src', name: 'Source' });
     } else {
-      options.attributes.push({
-        xpath: '.',
-        name: 'Text'
-      });
+      options.attributes.push({ xpath: '.', name: 'Text' });
     }
   }
   
@@ -160,8 +165,10 @@ bit155.scraper.select = function(context, selector, language) {
     }
     
     return $(result);
-  } else {
+  } else if (language === 'jquery') {
     return $(context).find(selector);
+  } else {
+    throw new Error('Unsupported selector language: ' + language);
   }
 };
 

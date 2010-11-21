@@ -88,4 +88,20 @@ describe('csv', function() {
       expect(bit155.csv.row({name: 'hello'})).toEqual('[object Object]');
     });
   });
+  
+  // csv
+  describe('csv', function() {
+    it('should encode nothing', function() {
+      expect(bit155.csv.csv()).toEqual('');
+    });
+    it('should encode an empty array', function() {
+      expect(bit155.csv.csv([])).toEqual('');
+    });
+    it('should encode a 2d array single row', function() {
+      expect(bit155.csv.csv([ ['one','two,too,to'] ])).toEqual('one,"two,too,to"\n');
+    });
+    it('should encode a 2d array two rows', function() {
+      expect(bit155.csv.csv([ ['one','two'], [3, 'four or "for"'] ])).toEqual('one,two\n3,"four or \\\"for\\\""\n');
+    });
+  });
 });
