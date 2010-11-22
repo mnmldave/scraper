@@ -50,8 +50,8 @@ describe('csv', function() {
     it('should encode string', function() {
       expect(bit155.csv.cell('my string')).toEqual('my string');
     });
-    it('should remove newlines by default', function() {
-      expect(bit155.csv.cell('my\nstring')).toEqual('"my string"');
+    it('should keep newlines', function() {
+      expect(bit155.csv.cell('my\nstring')).toEqual('"my\nstring"');
     });
     it('should not escape commas, only quote', function() {
       expect(bit155.csv.cell('my, string')).toEqual('"my, string"');
@@ -63,7 +63,7 @@ describe('csv', function() {
       expect(bit155.csv.cell('my\\string')).toEqual('my\\string');
     });
     it('should escape lots', function() {
-      expect(bit155.csv.cell('my\n"string" is, awesome\\wicked')).toEqual('"my ""string"" is, awesome\\wicked"');
+      expect(bit155.csv.cell('my\n"string" is, awesome\\wicked')).toEqual('"my\n""string"" is, awesome\\wicked"');
     });
     it('should not trim', function() {
       expect(bit155.csv.cell('  boo,  ')).toEqual('"  boo,  "');

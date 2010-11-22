@@ -53,7 +53,6 @@ bit155.csv.cell = function(cell) {
   }
   
   if (str.match(/[,"\n\r]/)) {
-    str = str.replace(/(\n|\r|\n\r)/g,' ');
     str = str.replace(/(["])/g, '"$1');
     str = '"' + str + '"';
   }  
