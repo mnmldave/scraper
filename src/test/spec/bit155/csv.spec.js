@@ -57,17 +57,21 @@ describe('csv', function() {
       expect(bit155.csv.cell('my, string')).toEqual('"my, string"');
     });
     it('should escape quotes', function() {
-      expect(bit155.csv.cell('my "string"')).toEqual('"my \\"string\\""');
+      expect(bit155.csv.cell('my "string"')).toEqual('"my ""string"""');
     });
-    it('should escape backspace', function() {
-      expect(bit155.csv.cell('my\\string')).toEqual('"my\\\\string"');
+    it('should not escape backspace', function() {
+      expect(bit155.csv.cell('my\\string')).toEqual('my\\string');
     });
     it('should escape lots', function() {
-      expect(bit155.csv.cell('my\n"string" is, awesome\\wicked')).toEqual('"my \\"string\\" is, awesome\\\\wicked"');
+      expect(bit155.csv.cell('my\n"string" is, awesome\\wicked')).toEqual('"my ""string"" is, awesome\\wicked"');
     });
     it('should not trim', function() {
       expect(bit155.csv.cell('  boo,  ')).toEqual('"  boo,  "');
     });
+    it('should escape multiple quotes', function() {
+      expect(bit155.csv.cell('2.5" / 230,000 px')).toEqual('"2.5"" / 230,000 px"');
+    });
+    
   });
   
   // row
@@ -101,7 +105,7 @@ describe('csv', function() {
       expect(bit155.csv.csv([ ['one','two,too,to'] ])).toEqual('one,"two,too,to"\n');
     });
     it('should encode a 2d array two rows', function() {
-      expect(bit155.csv.csv([ ['one','two'], [3, 'four or "for"'] ])).toEqual('one,two\n3,"four or \\\"for\\\""\n');
+      expect(bit155.csv.csv([ ['one','two'], [3, 'four or "for"'] ])).toEqual('one,two\n3,"four or ""for"""\n');
     });
   });
 });

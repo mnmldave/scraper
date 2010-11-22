@@ -52,9 +52,9 @@ bit155.csv.cell = function(cell) {
     str = cell.toString();
   }
   
-  if (str.match(/[\\,"\n\r]/)) {
+  if (str.match(/[,"\n\r]/)) {
     str = str.replace(/(\n|\r|\n\r)/g,' ');
-    str = str.replace(/([\\"])/g, '\\$1');
+    str = str.replace(/(["])/g, '"$1');
     str = '"' + str + '"';
   }  
   return str;
