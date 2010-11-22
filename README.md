@@ -34,10 +34,16 @@ Learn more about plugin development from the [Google Chrome Extensions](http://c
 A `Rakefile` is included for compiling the Google Chrome extension into a
 zip file. It also does javascript and css minification.
 
+License
+-------
+
+Scraper is open-sourced under a BSD license which you can find in `LICENSE.txt`.
+
 Credits
 -------
 
 Many of the icons used in this extension are from the generous [Yusuke Kamiyamane](http://p.yusukekamiyamane.com/).
+
 
 -----------------------------------------------------------------------------
 Copyright (c) 2010 David Heaton (dave@bit155.com)

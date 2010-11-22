@@ -363,6 +363,28 @@ $(function() {
 	  }
 	});
 	
+	// help dialog
+	$('#help-link').click(function() {
+	  var container = $('<div id="help">');
+	  container.append($('<h1>').text('Scraper'));
+	  container.append($('<h2>').text('By ').append($('<a target="_blank" href="http://bit155.com">').text('Dave Heaton')));
+	  container.append($('<dl>')
+	    .append($('<dt>').text('Homepage'))
+	    .append($('<dd>').append($('<a target="_blank" href="http://mnmldave.github.com/scraper/">').text('http://mnmldave.github.com/scraper/')))
+	    .append($('<dt>').text('License'))
+	    .append($('<dd>').append($('<a target="_blank" href="license.html">').text('BSD License')))
+    );
+	  container.dialog({
+      title: 'About',
+      closeText: 'Close',
+      buttons: [{
+        text: "Close",
+        click: function() { $(this).dialog("close"); }
+      }]
+	  });
+	  return false;
+	});
+	
   // scrape for the first time
 	viewer.scrape();
 	
@@ -378,7 +400,7 @@ $(function() {
     localStorage['viewer.west.size'] = layout.state.west.size;
     localStorage['viewer.west.closed'] = layout.state.west.isClosed;
   }, true);
-	
+  
 	// give selectorinput focus
 	$('#options-selector').select().focus();
 });

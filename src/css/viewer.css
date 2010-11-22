@@ -224,6 +224,21 @@ div.error.ui-dialog-content.ui-widget-content {
     #export textarea {
       display: none;
     }
+    
+#help {
+}
+
+  #help h1 {
+    margin: 0;
+  }
+
+  #help h2 {
+    font-size: 100%;
+  }
+  
+  #help dl {
+    margin-top: 2em;
+  }
 
 .ui-widget-header {
   background: -webkit-gradient(linear, left bottom, left top, color-stop(0.1, #ccc), color-stop(0.8, #eee));
