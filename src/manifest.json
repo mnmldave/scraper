@@ -1,9 +1,10 @@
 {
   "name": "Scraper",
-  "version": "1.2",
+  "version": "1.3",
   "description": "Scraper is a Google Chrome extension for getting data out of web pages and into spreadsheets.",
   "icons": {
     "16": "img/scraper16.png",
+    "32": "img/scraper32.png",
     "48": "img/scraper48.png",
     "128": "img/scraper128.png"
   },
