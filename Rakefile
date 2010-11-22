@@ -11,7 +11,7 @@
 #       notice, this list of conditions and the following disclaimer in the
 #       documentation and/or other materials provided with the distribution.
 #  
-#     * Neither the name of bit155.com nor the names of its contributors
+#     * Neither the name of bit155 nor the names of its contributors
 #       may be used to endorse or promote products derived from this software
 #       without specific prior written permission.
 #  
@@ -29,6 +29,8 @@
 require 'json'
 require 'yui/compressor'
 require 'closure-compiler'
+
+task :default => [:rebuild, :repackage]
 
 # Metadata
 # --------------------------------------------------------------------------
@@ -100,9 +102,8 @@ end
 
 directory package_dir
 
-file package_dir_path => build_dir do
+file package_dir_path => [package_dir, build_dir] do
   chdir(build_dir) do
-    mkdir_p package_dir rescue nil
     Dir.glob('**/*').each do |fn|
       f = File.join(File.dirname(__FILE__), package_dir_path, fn)
       fdir = File.dirname(f)
