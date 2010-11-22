@@ -41,8 +41,8 @@ bit155.scraper = bit155.scraper || {};
  * Generates bit155.scraper.scrape options for the given selection. Uses magic
  * to try and guess reasonable defaults.
  *
- * @param focusNode {node} same semantics as Selection.focusNode
- * @param anchorNode {node} (optional) same as Selection.anchorNode
+ * @param {Object} focusNode same semantics as Selection.focusNode
+ * @param {Object} anchorNode (optional) same as Selection.anchorNode
  */
 bit155.scraper.optionsForSelection = function(focusNode, anchorNode) {
   var options = {}, ancestor, ancestorTagName, ancestorClassName, node;
@@ -125,6 +125,10 @@ bit155.scraper.optionsForSelection = function(focusNode, anchorNode) {
       $.each(headers, function(index,name) {
         options.attributes.push({ xpath: '*[' + (index + 1) + ']', name: name });
       });
+      
+      // append a [td] constraint to the selector so that we don't scrape
+      // rows containing only headers
+      options.selector = options.selector + "[td]";
     } else if (ancestorTagName === 'a') {
       options.attributes.push({ xpath: '.', name: 'Link' });
       options.attributes.push({ xpath: '@href', name: 'URL' });
