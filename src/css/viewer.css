@@ -169,10 +169,11 @@ div.error.ui-dialog-content.ui-widget-content {
     margin: 0;
     padding: 0;
     width: 100%;
+    border-collapse: collapse;
   }
 
     #options-selector-table td {
-      padding: 5px;
+      padding: 2px 5px;
     }
     
     #options-selector-table select {
@@ -184,6 +185,22 @@ div.error.ui-dialog-content.ui-widget-content {
       border-radius: 5px;
       -webkit-box-shadow: inset 1px 2px 3px rgba(0,0,0,0.2);
       padding: 5px 5px;
+    }
+
+    #options-language-help a {
+      background-image: url('../img/question-small-white.png');
+      background-repeat: no-repeat;
+      background-position: 0 -2px;
+      padding-left: 20px;
+      min-height: 16px;
+      display: inline-block;
+      vertical-align: middle;
+      color: #666;
+      text-decoration: none;
+    }
+    
+    #options-language-help a:hover {
+      text-decoration: underline;
     }
 
     #options-selector {

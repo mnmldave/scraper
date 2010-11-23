@@ -63,21 +63,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. -->
   
   <div id="presets">
     <p>
-      Save your current settings as a preset to quickly restore them in the future.
+      Save your current settings as a preset to quickly restore them in the 
+      future.
     </p>
     <form id="presets-form">
       <input id="presets-form-name" name="name" type="text" value="">
       <input type="submit" value="Save">
-      <br/>
-      
-      <input checked id="presets-form-options-selector" name="options[]" type="checkbox" value="selector">
-      <label for="presets-form-options-selector" title="Include the selector and language with this preset.">Selector</label>
-      
-      <input checked id="presets-form-options-attributes" name="options[]" type="checkbox" value="attributes">
-      <label for="presets-form-options-attributes" title="Include the attributes with this preset.">Attributes</label>
-      
-      <input checked id="presets-form-options-filters" name="options[]" type="checkbox" value="filters">
-      <label for="presets-form-options-filters" title="Include filters with this preset.">Filters</label>
     </form>
     <ul id="presets-list">
     </ul>
@@ -103,6 +94,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. -->
             </td>
             <td nowrap width="100%">
               <input id="options-selector" name="selector" type="text" placeholder="Selector" />
+            </td>
+          </tr>
+          <tr>
+            <td>
+            </td>
+            <td>
+              <div id="options-language-help"></div>
             </td>
           </tr>
         </table>
@@ -136,7 +134,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. -->
       <table>
         <tr>
           <td>
-            <a id="presets-button" class="button" href="javascript:;">Presets...</a>
+            <a id="options-reset-button" class="button" href="javascript:;">Reset</a>
+            <a id="options-presets-button" class="button" href="javascript:;">Presets...</a>
           </td>
           <td><input id="options-submit" type="submit" value="Scrape"></td>
         </tr>

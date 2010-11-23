@@ -83,6 +83,7 @@ Viewer.prototype.presetList = bit155.attr({
       var handle = $('<img class="preset-handle" src="img/application-form.png">');
       var load = $('<a class="preset-load" href="javascript:;" title="Load this preset.">').text(preset.name).click(function() {
         self.options(preset.options);
+        $('#presets-form-name').val(preset.name);
         $('#presets').dialog('close');
         self.scrape();
         return false;
@@ -360,12 +361,12 @@ $(function() {
 	    'empty'
 	  ]
 	}));
-	var options = $.extend({}, savedOptions, queryOptions);
-
+	var originalOptions = $.extend({}, savedOptions, queryOptions);
+	
 	// create viewer
   var viewer = new Viewer();
   viewer.tabId(queryTabId);
-  viewer.options(options);
+  viewer.options(originalOptions);
   
   // layout view
   var layout = $('body').layout({ 
@@ -409,7 +410,6 @@ $(function() {
 	    chrome.tabs.update(viewer.tabId(), { selected: true });
 	    return false;
 	  }));
-	  $('#presets-form-name').val(tab.title);
 	};
 	chrome.tabs.get(viewer.tabId(), function(tab) { 
 	  updateMeta(tab);
@@ -441,7 +441,7 @@ $(function() {
 	  return false;
 	});
 	
-	// initialize presets
+	// presets
 	$('#presets').dialog({
 	  autoOpen: false,
 	  width: Math.max(100, parseInt(JSON.parse(localStorage['viewer.presets.width'] || '400'), 10)),
@@ -457,7 +457,7 @@ $(function() {
       localStorage['viewer.presets.height'] = $(this).dialog('option', 'height');
 	  }
 	});
-	$('#presets-button').click(function() {
+	$('#options-presets-button').click(function() {
     $('#presets').dialog('open');
 	  return false;
 	});
@@ -468,13 +468,11 @@ $(function() {
 	  var options = viewer.options();
 	  var i;
 	  
-	  // make sure there's a name
+	  // make sure it's a unique name
 	  if ($.trim(presetForm.name || '') === '') {
 	    viewer.error('You must specify a name for the preset.');
 	    return false;
 	  }
-	  
-	  // make sure name is unique (BLAH)
 	  for (i = 0; i < presetList.length; i++) {
 	    if (presetList[i].name === presetForm.name) {
 	      if (!confirm('There is already a preset with the name "' + presetForm.name + '". Do you want to overwrite the existing preset?')) {
@@ -483,28 +481,15 @@ $(function() {
 	    }
 	  }
 	  
-	  // make sure at least option selected
-	  if (!presetForm.options || presetForm.options.length === 0) {
-	    viewer.error('You must choose at least one of "Selector", "Attributes" or "Filters" to save with the preset.');
-	    return false;
-	  }
-	  
 	  // configure preset
 	  preset.name = presetForm.name;
     preset.options = {};
-	  $.each(presetForm.options, function(i, opt) {
-	    if (opt === 'selector') {
-	      preset.options.language = options.language;
-	      preset.options.selector = options.selector;
-	    } else if (opt === 'attributes') {
-	      preset.options.attributes = $.extend(true, [], options.attributes);
-	    } else if (opt === 'filters') {
-	      preset.options.filters = $.extend(true, [], options.filters);
-	    }
-	  });
+    preset.options.language = options.language;
+    preset.options.selector = options.selector;
+    preset.options.attributes = $.extend(true, [], options.attributes);
+    preset.options.filters = $.extend(true, [], options.filters);
 	  
-	  // remove any existing presets with the same name, append new preset,
-	  // and save
+	  // remove existing presets with the same name, append new preset, and save
 	  presetList = presetList.filter(function(p) { return p.name !== preset.name; });
 	  presetList.unshift(preset);
 	  viewer.presetList(presetList);
@@ -555,6 +540,28 @@ $(function() {
 	  }
 	])));
 	
+	// reset button
+	$('#options-reset-button').click(function() {
+	  if (confirm("Do you want to reset the options to their original values?")) {
+	    $('#presets-form-name').val('');
+	    viewer.options(originalOptions);
+	    viewer.scrape();
+    }
+	  return false;
+	});
+  
+  // language
+  $('#options-language').change(function() {
+    var lang = $('#options-language').val();
+    $('#options-language-help').empty();
+    if (lang === 'jquery') {
+      $('#options-language-help').append($('<a href="http://api.jquery.com/category/selectors/" target="_blank">').text('jQuery Reference'));
+    } else if (lang === 'xpath') {
+      $('#options-language-help').append($('<a href="http://www.stylusstudio.com/docs/v62/d_xpath15.html" target="_blank">').text('XPath Reference'));
+    }
+  });
+  $('#options-language').change();
+  
   // initial scrape
 	viewer.scrape();
 	
