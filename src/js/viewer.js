@@ -80,11 +80,13 @@ Viewer.prototype.presetList = bit155.attr({
   	list = $('#presets-list');
   	list.empty();
     $.each(presets || [], function(i, preset) {
-      var link = $('<a class="preset-load" href="javascript:;" title="Load this preset.">').text(preset.name).click(function() {
+      var load = $('<a class="preset-load" href="javascript:;" title="Load this preset.">').append($('<img src="img/application-form.png">')).click(function() {
         self.options(preset.options);
         $('#presets').dialog('close');
+        self.scrape();
         return false;
       });
+      var name = $('<span class="preset-name">').text(preset.name);
       var remove = $('<a class="preset-remove" href="javascript:;" title="Remove this preset.">').append($('<img src="img/bullet_delete.png" title="Remove preset.">')).click(function() {
         if (confirm('Are you sure you want to remove the preset, "' + preset.name + '"?')) {
           presets.splice(i,1);
@@ -92,7 +94,7 @@ Viewer.prototype.presetList = bit155.attr({
         }
       });
       
-      list.append($('<li>').append(link).append(remove));
+      list.append($('<li>').attr('id', 'preset-' + i).append(load).append(name).append(remove));
   	});
   }
 });
@@ -508,6 +510,24 @@ $(function() {
 	  viewer.presetList(presetList);
 	  
 	  return false;
+	});
+	$('#presets-list').sortable({
+	  update: function(event, ui) {
+	    var presetMap = {};
+	    var presetList = [];
+	    
+	    // map existing presets to identifier strings
+	    $.each(viewer.presetList(), function(i, p) {
+	      presetMap['preset-' + i] = p;
+	    });
+	    
+	    // reorder the preset list
+	    $.each($(this).sortable('toArray'), function(i, id) {
+	      presetList.push(presetMap[id]);
+	    });
+	    
+	    viewer.presetList(presetList);
+	  }
 	});
 	viewer.presetList(JSON.parse(localStorage['viewer.presets'] || '[]'));
 	

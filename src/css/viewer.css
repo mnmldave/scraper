@@ -85,16 +85,28 @@ div.error.ui-dialog-content.ui-widget-content {
       background-color: #eee;
     }
     
+      #presets-list li {
+        padding-right: 26px;
+        cursor: move;
+      }
+    
       #presets-list li .preset-load {
-        background-image: url('../img/application-form.png');
-        background-repeat: no-repeat;
-        padding-left: 24px;
         display: inline-block;
+        cursor: pointer;
+        margin-right: 10px;
+        vertical-align: middle;
+      }
+      
+      #presets-list li .preset-name {
+        display: inline-block;
+        vertical-align: middle;
         min-height: 16px;
+        cursor: move;
       }
     
       #presets-list li .preset-remove {
-        float: right;
+        position: absolute;
+        right: 16px;
       }
 
 #options {
