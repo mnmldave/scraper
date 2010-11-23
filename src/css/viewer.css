@@ -73,7 +73,6 @@ div.error.ui-dialog-content.ui-widget-content {
     }
     
     #presets-list li a {
-      text-decoration: none;
       color: #333;
     }
     
@@ -87,21 +86,22 @@ div.error.ui-dialog-content.ui-widget-content {
     
       #presets-list li {
         padding-right: 26px;
-        cursor: move;
       }
     
-      #presets-list li .preset-load {
-        display: inline-block;
-        cursor: pointer;
-        margin-right: 10px;
-        vertical-align: middle;
+      #presets-list li .preset-handle {
+        position: absolute;
+        left: 16px;
+        cursor: move;
       }
       
-      #presets-list li .preset-name {
+      #presets-list li .preset-load {
+        cursor: pointer;
         display: inline-block;
         vertical-align: middle;
         min-height: 16px;
-        cursor: move;
+        cursor: pointer;
+        margin-left: 21px;
+        margin-right: 21px;
       }
     
       #presets-list li .preset-remove {
@@ -165,6 +165,10 @@ div.error.ui-dialog-content.ui-widget-content {
 
     #options-selector-table td {
       padding: 5px;
+    }
+    
+    #options-selector-table select {
+      height: 25px;
     }
 
     #options-selector-table input[type=text] {

@@ -80,13 +80,13 @@ Viewer.prototype.presetList = bit155.attr({
   	list = $('#presets-list');
   	list.empty();
     $.each(presets || [], function(i, preset) {
-      var load = $('<a class="preset-load" href="javascript:;" title="Load this preset.">').append($('<img src="img/application-form.png">')).click(function() {
+      var handle = $('<img class="preset-handle" src="img/application-form.png">');
+      var load = $('<a class="preset-load" href="javascript:;" title="Load this preset.">').text(preset.name).click(function() {
         self.options(preset.options);
         $('#presets').dialog('close');
         self.scrape();
         return false;
       });
-      var name = $('<span class="preset-name">').text(preset.name);
       var remove = $('<a class="preset-remove" href="javascript:;" title="Remove this preset.">').append($('<img src="img/bullet_delete.png" title="Remove preset.">')).click(function() {
         if (confirm('Are you sure you want to remove the preset, "' + preset.name + '"?')) {
           presets.splice(i,1);
@@ -94,7 +94,7 @@ Viewer.prototype.presetList = bit155.attr({
         }
       });
       
-      list.append($('<li>').attr('id', 'preset-' + i).append(load).append(name).append(remove));
+      list.append($('<li>').attr('id', 'preset-' + i).append(handle).append(load).append(remove));
   	});
   }
 });
@@ -529,7 +529,31 @@ $(function() {
 	    viewer.presetList(presetList);
 	  }
 	});
-	viewer.presetList(JSON.parse(localStorage['viewer.presets'] || '[]'));
+	viewer.presetList(JSON.parse(localStorage['viewer.presets'] || JSON.stringify([
+	  { 
+	    name: 'Paragraph Text', 
+	    options: {
+	      language: 'xpath',
+	      selector: '//p',
+	      attributes: [
+	        { xpath: '.', name: 'Text' }
+	      ],
+	      filters: [ 'empty' ]
+	    }
+	  },
+	  { 
+	    name: 'Links', 
+	    options: {
+	      language: 'xpath',
+	      selector: '//a',
+	      attributes: [
+	        { xpath: '.', name: 'Link' },
+	        { xpath: '@href', name: 'URL' }
+	      ],
+	      filters: ['empty']
+	    }
+	  }
+	])));
 	
   // initial scrape
 	viewer.scrape();
