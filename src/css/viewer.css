@@ -18,6 +18,7 @@ a.button, button, input[type=submit] {
   color: #333;
   text-shadow: 0 1px rgba(255,255,255,0.8);
   text-decoration: none;
+  font-size: 11px;
 }
 
 a.button:active, button:active, input[type=submit]:active {
@@ -46,10 +47,17 @@ div.error.ui-dialog-content.ui-widget-content {
 }
 
   #presets-form {
-    padding-bottom: 10px;
+    padding-bottom: 15px;
     margin-bottom: 10px;
     border-bottom: 1px solid #aaa;
   }
+  
+    #presets-form fieldset {
+      margin-top: 10px;
+      padding-top: 5px;
+      border: none;
+      border-top: 1px solid #aaa;
+    }
   
     #presets-form-name {
       width: 70%;
@@ -304,10 +312,6 @@ div.error.ui-dialog-content.ui-widget-content {
     text-align: right;
     height: 30px;
   }
-
-    #export textarea {
-      display: none;
-    }
     
 #about {
   display: none;
