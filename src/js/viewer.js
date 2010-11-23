@@ -111,8 +111,8 @@ Viewer.prototype.options = function(opts) {
     var self = this;
     
     // selector and language
-    $('#options-selector').val(opts.selector);
-    $('#options-language').val(opts.language);
+    $('#options-selector').val(opts.selector).change();
+    $('#options-language').val(opts.language).change();
     
     // attributes
     if ($.isArray(opts.attributes) && opts.attributes.length > 0) {
