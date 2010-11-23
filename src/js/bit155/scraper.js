@@ -38,6 +38,41 @@ var bit155 = bit155 || {};
 bit155.scraper = bit155.scraper || {};
 
 /**
+ * Generates an xpath that is specific, but hopefully not too specific, for
+ * a node.
+ *
+ * @param {Object} node to generate xpath for
+ */
+bit155.scraper.xpathForNode = function(node) {
+  var xpath = $(node).xpath();
+  var xpathLastPredicateRegex = /^(.*)(\[\d+\])([^\[\]]*)$/;
+  var xpathFirstSegmentRegex = /^(\/+[^\/]+)(.*)$/;
+  var result;
+  var selection;
+  
+  // keep cutting out the last predicate until we match more than one node
+  // and consider this our ideal selection
+  while ((result = xpathLastPredicateRegex.exec(xpath))) {
+    selection = bit155.scraper.select(document, xpath, 'xpath');
+    if (selection.length > 1) {
+      break;
+    }
+    xpath = result[1] + result[3];
+  }
+  
+  // trim the front of the path until we have smallest xpath that returns
+  // same number of elements
+  while ((result = xpathFirstSegmentRegex.exec(xpath))) {
+    if (bit155.scraper.select(document, '/' + result[2], 'xpath').length !== selection.length) {
+      break;
+    }
+    xpath = '/' + result[2];
+  }
+  
+  return xpath;
+};
+
+/**
  * Generates bit155.scraper.scrape options for the given selection. Uses magic
  * to try and guess reasonable defaults.
  *
@@ -78,22 +113,7 @@ bit155.scraper.optionsForSelection = function(focusNode, anchorNode) {
     //  * ignores semantics
     //
     options.language = 'xpath';
-    options.selector = (function() {
-      var xpathRegex = /^(.*)(\[\d+\])([^\[\]]*)$/;
-      var xpath = $(node).xpath();
-      var result;
-      
-      // keep cutting out the last "[n]" specifier until we match more than
-      // one element
-      while ((result = xpathRegex.exec(xpath))) {
-        if (bit155.scraper.select(document, xpath, 'xpath').length > 1) {
-          break;
-        }
-        xpath = result[1] + result[3];
-      }
-      
-      return xpath;
-    }()) || '';
+    options.selector = bit155.scraper.xpathForNode(node);
     
     // use "magical" attributes depending on what custom ancestor is
     if (ancestorTagName === 'tr') {

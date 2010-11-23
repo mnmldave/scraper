@@ -84,8 +84,17 @@ bit155.attr = function(options) {
         }
       }
       
-      // assign new value
-      _value = newValue;
+      // copy new value
+      if (typeof newValue === 'object') {
+        if ($.isArray(newValue)) {
+          _value = $.extend(true, [], newValue);
+        } else {
+          _value = $.extend(true, {}, newValue);          
+        }
+      } else {
+        _value = newValue;
+      }
+      
       if (callback) {
         callback.apply(this, [newValue, oldValue]);
       }

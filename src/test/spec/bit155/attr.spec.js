@@ -36,6 +36,21 @@
 
 // attr
 describe('attr', function() {
+  it('should copy arrays', function() {
+    var MyClass = function() {
+      this.data = bit155.attr();
+    };
+    
+    var my = new MyClass();
+    var data = ['hello', 'jello'];
+    my.data(data);
+    
+    expect(my.data()).toEqual(['hello', 'jello']);
+    data.push('bellow');
+    
+    expect(my.data()).toEqual(['hello', 'jello']);
+  });
+  
   it('should set simple value', function() {
     var MyClass = function() {
       this.name = bit155.attr();
