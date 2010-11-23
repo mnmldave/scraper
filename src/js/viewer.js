@@ -59,15 +59,51 @@ Viewer.prototype.tabId = bit155.attr({
 });
 
 /**
+ * Contains an array of preset objects, where each object has a String 'name'
+ * property, and an Object 'options' property.
+ */
+Viewer.prototype.presetList = bit155.attr({
+  filter: function(v) {
+    if (v && !$.isArray(v)) {
+      throw new Error('Presets must be in an array.');
+    }
+    return v;
+  },
+  callback: function(presets) {
+    var list;
+    var self = this;
+    
+    // save to local storage
+    localStorage['viewer.presets'] = presets ? JSON.stringify(presets) : null;
+
+    // update list
+  	list = $('#presets-list');
+  	list.empty();
+    $.each(presets || [], function(i, preset) {
+      var link = $('<a class="preset-load" href="javascript:;" title="Load this preset.">').text(preset.name).click(function() {
+        self.options(preset.options);
+        $('#presets').dialog('close');
+        return false;
+      });
+      var remove = $('<a class="preset-remove" href="javascript:;" title="Remove this preset.">').append($('<img src="img/bullet_delete.png" title="Remove preset.">')).click(function() {
+        if (confirm('Are you sure you want to remove the preset, "' + preset.name + '"?')) {
+          presets.splice(i,1);
+          self.presetList(presets); 
+        }
+      });
+      
+      list.append($('<li>').append(link).append(remove));
+  	});
+  }
+});
+
+/**
  * Returns the current options (as encapsulated by the form) or sets new 
  * options.
  *
  * @param opts {object} (optional) new options to set
  */
 Viewer.prototype.options = function(opts) {
-  // ARCH using view as storage for options is really nice, but maybe not best
-  // choice in longrun. perhaps use a storage adapter implementation backed by
-  // a form?
   if (opts) {
     var self = this;
     
@@ -155,6 +191,24 @@ Viewer.prototype.addAttribute = function(xpath, name, context) {
 };
 
 /**
+ * Displays an error message.
+ *
+ * @param {Object} an error object containing a "message" property, or a
+ *        string, to display
+ */
+Viewer.prototype.error = function(error) {
+  console.log(error);
+  $('<div class="error">').text(error.message ? error.message : '' + error).dialog({
+    title: 'Error',
+    modal: true,
+    buttons: [{
+      text: "Close",
+      click: function() { $(this).dialog("close"); }
+    }]
+  });
+};
+
+/**
  * Reloads the view based on current data.
  */
 Viewer.prototype.reload = function() {
@@ -165,14 +219,7 @@ Viewer.prototype.reload = function() {
 
   // error
   if (data.error) {
-    $('<div class="error">').text(data.error.message ? data.error.message : '' + data.error).dialog({
-      title: 'Error',
-      modal: true,
-      buttons: [{
-        text: "Ok",
-        click: function() { $(this).dialog("close"); }
-      }]
-    });
+    this.error(data.error);
   }
 
   // headers
@@ -325,7 +372,7 @@ $(function() {
       minSize: 250,
       closable: true,
       resizable: true,
-      slidable: false
+      slidable: true
     }
   });
   if (localStorage['viewer.west.size']) {
@@ -354,39 +401,124 @@ $(function() {
 	});
 	
 	// update title whenever tab changes
+	var updateMeta = function(tab) {
+	  document.title = "Scraper - " + tab.title;
+	  $('#options-meta-page').empty().append($('<a>').attr('href', tab.url).text(tab.title).click(function() {
+	    chrome.tabs.update(viewer.tabId(), { selected: true });
+	    return false;
+	  }));
+	  $('#presets-form-name').val(tab.title);
+	};
 	chrome.tabs.get(viewer.tabId(), function(tab) { 
-	  document.title = "Scraper - " + tab.title; 
+	  updateMeta(tab);
 	});
 	chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 	  if (tabId === viewer.tabId()) {
-	    document.title = "Scraper - " + tab.title;
+	    updateMeta(tab);
 	  }
 	});
 	
 	// help dialog
-	$('#help-link').click(function() {
-	  var container = $('<div id="help">');
-	  container.append($('<h1>').text('Scraper'));
-	  container.append($('<h2>').text('By ').append($('<a target="_blank" href="http://bit155.com">').text('Dave Heaton')));
-	  container.append($('<dl>')
-	    .append($('<dt>').text('Homepage'))
-	    .append($('<dd>').append($('<a target="_blank" href="http://mnmldave.github.com/scraper/">').text('http://mnmldave.github.com/scraper/')))
-	    .append($('<dt>').text('License'))
-	    .append($('<dd>').append($('<a target="_blank" href="license.html">').text('BSD License')))
-    );
-	  container.dialog({
-      title: 'About',
-      closeText: 'Close',
-      buttons: [{
-        text: "Close",
-        click: function() { $(this).dialog("close"); }
-      }]
-	  });
+	$('#about').dialog({
+	  autoOpen: false,
+	  draggable: false,
+	  resizable: false,
+    title: 'About',
+    width: 400,
+    show: 'fade',
+    hide: 'fade',
+    modal: true,
+    closeText: 'Close',
+    buttons: [{
+      text: "Close",
+      click: function() { $(this).dialog("close"); }
+    }]
+  });
+	$('#about-link').click(function() {
+	  $('#about').dialog('open');
 	  return false;
 	});
 	
-  // scrape for the first time
+	// initialize presets
+	$('#presets').dialog({
+	  autoOpen: false,
+	  width: Math.max(100, parseInt(JSON.parse(localStorage['viewer.presets.width'] || '400'), 10)),
+	  height: Math.max(100, parseInt(JSON.parse(localStorage['viewer.presets.height'] || '300'), 10)),
+	  position: JSON.parse(localStorage['viewer.presets.position'] || '"center"'),
+	  modal: true,
+	  title: 'Presets',
+	  beforeClose: function() {
+	    var position = $(this).dialog('option', 'position');
+	    
+	    localStorage['viewer.presets.position'] = JSON.stringify([position[0], position[1]]);
+      localStorage['viewer.presets.width'] = $(this).dialog('option', 'width');
+      localStorage['viewer.presets.height'] = $(this).dialog('option', 'height');
+	  }
+	});
+	$('#presets-button').click(function() {
+    $('#presets').dialog('open');
+	  return false;
+	});
+	$('#presets-form').submit(function() {
+	  var preset = {};
+	  var presetList = viewer.presetList();
+	  var presetForm = $(this).serializeParams();
+	  var options = viewer.options();
+	  var i;
+	  
+	  // make sure there's a name
+	  if ($.trim(presetForm.name || '') === '') {
+	    viewer.error('You must specify a name for the preset.');
+	    return false;
+	  }
+	  
+	  // make sure name is unique (BLAH)
+	  for (i = 0; i < presetList.length; i++) {
+	    if (presetList[i].name === presetForm.name) {
+	      if (!confirm('There is already a preset with the name "' + presetForm.name + '". Do you want to overwrite the existing preset?')) {
+	        return false;
+        }
+	    }
+	  }
+	  
+	  // make sure at least option selected
+	  if (!presetForm.options || presetForm.options.length === 0) {
+	    viewer.error('You must choose at least one of "Selector", "Attributes" or "Filters" to save with the preset.');
+	    return false;
+	  }
+	  
+	  // configure preset
+	  preset.name = presetForm.name;
+    preset.options = {};
+	  $.each(presetForm.options, function(i, opt) {
+	    if (opt === 'selector') {
+	      preset.options.language = options.language;
+	      preset.options.selector = options.selector;
+	    } else if (opt === 'attributes') {
+	      preset.options.attributes = $.extend(true, [], options.attributes);
+	    } else if (opt === 'filters') {
+	      preset.options.filters = $.extend(true, [], options.filters);
+	    }
+	  });
+	  
+	  // remove any existing presets with the same name, append new preset,
+	  // and save
+	  presetList = presetList.filter(function(p) { return p.name !== preset.name; });
+	  presetList.unshift(preset);
+	  viewer.presetList(presetList);
+	  
+	  return false;
+	});
+	viewer.presetList(JSON.parse(localStorage['viewer.presets'] || '[]'));
+	
+  // initial scrape
 	viewer.scrape();
+	
+	// save dimensions upon resize
+	addEventListener('resize', function(event) {
+    localStorage['viewer.width'] = window.outerWidth;
+    localStorage['viewer.height'] = window.outerHeight;
+	});
 	
 	// save options on close
   addEventListener("unload", function(event) {
@@ -395,8 +527,6 @@ $(function() {
       options.filters = [];
     }
     localStorage['viewer.options'] = JSON.stringify(options);
-    localStorage['viewer.width'] = window.outerWidth;
-    localStorage['viewer.height'] = window.outerHeight;
     localStorage['viewer.west.size'] = layout.state.west.size;
     localStorage['viewer.west.closed'] = layout.state.west.isClosed;
   }, true);

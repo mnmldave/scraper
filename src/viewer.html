@@ -46,13 +46,49 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. -->
 
 </head>
 <body>
+  <div id="about">
+    <h1>Scraper</h1>
+    <h2>By <a href="http://bit155.com">Dave Heaton</a></h2>
+    <p>
+      Some of the icons used in this extension are from the generous
+      <a href="http://p.yusukekamiyamane.com/">Yusuke Kamiyamane</a>.
+    </p>
+    <dl>
+      <dt>Project Page</dt>
+      <dd><a href="http://mnmldave.github.com/scraper/" target="_blank">http://mnmldave.github.com/scraper/</a></dd>
+      <dt>License</dt>
+      <dd><a href="license.html" target="_blank">BSD License</a></dd>
+    </dl>
+  </div>
+  
+  <div id="presets">
+    <form id="presets-form">
+      <input id="presets-form-name" name="name" type="text" value="">
+      <input type="submit" value="Add">
+      <br/>
+      
+      <input checked id="presets-form-options-selector" name="options[]" type="checkbox" value="selector">
+      <label for="presets-form-options-selector" title="Include the selector and language with this preset.">Selector</label>
+      
+      <input checked id="presets-form-options-attributes" name="options[]" type="checkbox" value="attributes">
+      <label for="presets-form-options-attributes" title="Include the attributes with this preset.">Attributes</label>
+      
+      <input checked id="presets-form-options-filters" name="options[]" type="checkbox" value="filters">
+      <label for="presets-form-options-filters" title="Include filters with this preset.">Filters</label>
+    </form>
+    <ul id="presets-list">
+    </ul>
+  </div>
+  
   <form id="options" class="ui-layout-west">
+    <div id="options-header">
+      <div id="options-meta-page"></div>
+    </div>
+    
     <div id="options-center" class="ui-layout-content">
-      <div id="error"></div>
-
       <fieldset>
         <legend>Selector</legend>
-        <table id="options-head">
+        <table id="options-selector-table">
           <tr>
             <td nowrap width="0%">
               <select id="options-language" name="language">
@@ -93,10 +129,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. -->
       </fieldset>
     </div>
     
-    <div id="options-footer">
+    <div id="options-footer" class="pane-footer">
       <table>
         <tr>
-          <td><a id="help-link" href="http://mnmldave.github.com/scraper/" target="_blank"><img src="img/question.png"></a></td>
+          <td>
+            <a id="presets-button" class="button" href="javascript:;">Presets...</a>
+          </td>
           <td><input id="options-submit" type="submit" value="Scrape"></td>
         </tr>
       </table>
@@ -107,10 +145,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. -->
     <div id="results-table" class="ui-layout-content">
     </div>
 
-    <div id="export">
-      <form action="">
-        <input id="export-google" type="submit" value="Export to Google Docs...">
-      </form>
+    <div id="export" class="pane-footer">
+      <table>
+        <tr>
+          <td><a id="about-link" href="http://mnmldave.github.com/scraper/" target="_blank"><img src="img/question.png"></a></td>
+          <td>
+            <form action="">
+              <input id="export-google" type="submit" value="Export to Google Docs...">
+            </form>
+          </td>
+        </tr>
     </div>
   </div>
 </body>

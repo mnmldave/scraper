@@ -5,23 +5,33 @@ body {
   padding: 0;
 }
 
-button, input[type=submit] {
+a:focus {
+  outline: none;
+}
+
+a.button, button, input[type=submit] {
+  outline: none;
   border: 1px solid #aaa;
   padding: 7px 10px;
   border-radius: 5px;    
   background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#ddd));
   color: #333;
   text-shadow: 0 1px rgba(255,255,255,0.8);
+  text-decoration: none;
 }
 
-button:active, input[type=submit]:active {
+a.button:active, button:active, input[type=submit]:active {
   background: -webkit-gradient(linear, left top, left bottom, from(#ddd), to(#eee));
+}
+
+a.button:focus, button:focus, input[type=submit]:focus {
+  border-color: #999;
+  -webkit-box-shadow: 0 0 3px rgba(0,0,0,0.3);
 }
 
 select {
   border: 1px solid #aaa;
   padding: 3px;
-  height: 25px;
 }
 
 div.error.ui-dialog-content.ui-widget-content {
@@ -31,12 +41,91 @@ div.error.ui-dialog-content.ui-widget-content {
   background-image: url('../img/exclamation-red.png');
 }
 
+#presets {
+  display: none;
+}
+
+  #presets-form {
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #aaa;
+  }
+  
+    #presets-form-name {
+      width: 70%;
+      border: 1px solid #999;
+      border-radius: 5px;
+      -webkit-box-shadow: inset 1px 2px 3px rgba(0,0,0,0.2);
+      padding: 5px 5px;
+      margin-bottom: 10px;
+    }
+
+  #presets-list {
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+  }
+  
+    #presets-list li {
+      list-style: none;
+      margin: 0;
+      padding: 10px;
+    }
+    
+    #presets-list li a {
+      text-decoration: none;
+      color: #333;
+    }
+    
+    #presets-list li a:focus {
+      outline: none;
+    }
+    
+    #presets-list li:hover {
+      background-color: #eee;
+    }
+    
+      #presets-list li .preset-load {
+        background-image: url('../img/application-form.png');
+        background-repeat: no-repeat;
+        padding-left: 24px;
+        display: inline-block;
+        min-height: 16px;
+      }
+    
+      #presets-list li .preset-remove {
+        float: right;
+      }
+
 #options {
   -webkit-user-select: none;
 } 
 
+  #options-header {
+    min-height: 30px;
+    border-top: 1px solid #fff !important;
+    background: -webkit-gradient(linear, left bottom, left top, color-stop(0.1, #ccc), color-stop(0.8, #eee));
+    padding: 10px;
+  }
+  
+    #options-meta-page {
+      background-image: url('../img/scraper32.png');
+      background-position: top left;
+      background-repeat: no-repeat;
+      min-height: 32px;
+      padding-left: 42px;
+    }
+    
+    #options-meta-page a {
+      text-decoration: none;
+      color: #444;
+      text-shadow: 0 1px 0 #fff;
+      font-weight: bold;
+      font-size: 120%;
+    }
+
   #options-center {
-    background-color: #ededed !important;
+    background-color: #f4f4f4 !important;
     border-bottom: 1px solid #aaa !important;
     padding: 10px;
     border-top: 1px solid #aaa;
@@ -56,51 +145,26 @@ div.error.ui-dialog-content.ui-widget-content {
     text-shadow: 0 1px rgba(255,255,255,0.9);
   }
 
-  #options-head {
+  #options-selector-table {
     margin: 0;
     padding: 0;
     width: 100%;
   }
 
-    #options-head td {
+    #options-selector-table td {
       padding: 5px;
     }
 
-    #options-head input[type=text] {
+    #options-selector-table input[type=text] {
       border: 1px solid #999;
       border-radius: 5px;
       -webkit-box-shadow: inset 1px 2px 3px rgba(0,0,0,0.2);
       padding: 5px 5px;
     }
 
-  #options-selector {
-    width: 100%;
-  }
-
-  #options-footer {
-    height: 30px;
-    border-top: 1px solid #fff !important;
-    background: -webkit-gradient(linear, left bottom, left top, color-stop(0.1, #ccc), color-stop(0.8, #eee));
-    padding: 10px;
-  }
-
-    #options-footer table {
+    #options-selector {
       width: 100%;
-      margin: 0;
-      padding: 0;
-      border: 0;
-      border-collapse: collapse;
     }
-  
-      #options-footer table td {
-        margin: 0;
-        padding: 0;
-        text-align: right;
-      }
-
-      #options-footer table td:first-child {
-        text-align: left;
-      }
 
   #options-attributes {
     width: 100%;
@@ -160,6 +224,10 @@ div.error.ui-dialog-content.ui-widget-content {
 
   #options-attributes img {
     margin-right: 5px;
+  }
+  
+  #options-presets-select {
+    width: 50%;
   }
 
 #center {
@@ -225,27 +293,52 @@ div.error.ui-dialog-content.ui-widget-content {
       display: none;
     }
     
-#help {
+#about {
+  display: none;
+  padding-top: 10px;
+  background-image: url('../img/scraper48.png');
+  background-repeat: no-repeat;
+  background-position: 10px 10px;
+  padding-left: 70px;
 }
 
-  #help h1 {
+  #about h1 {
     margin: 0;
   }
 
-  #help h2 {
+  #about h2 {
     font-size: 100%;
   }
   
-  #help dl {
+  #about dl {
     margin-top: 2em;
   }
-
-.ui-widget-header {
+  
+.pane-footer {
+  height: 30px;
+  border-top: 1px solid #fff !important;
   background: -webkit-gradient(linear, left bottom, left top, color-stop(0.1, #ccc), color-stop(0.8, #eee));
-  border: none;
-  border-bottom: 1px solid #aaa;
-  width: 100%;
+  padding: 10px;
 }
+
+  .pane-footer table {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-collapse: collapse;
+  }
+
+  .pane-footer table td {
+    margin: 0;
+    padding: 0;
+    text-align: right;
+  }
+
+  .pane-footer table td:first-child {
+    text-align: left;
+  }
+
 
 .ui-corner-all {
   border-radius: 0;
