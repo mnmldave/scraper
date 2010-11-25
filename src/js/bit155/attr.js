@@ -78,7 +78,7 @@ bit155.attr = function(options) {
       // filter value
       oldValue = _value;
       if (filter) {
-        var filteredValue = filter.apply(this, [newValue, oldValue]);
+        var filteredValue = filter.call(this, newValue, oldValue);
         if (filteredValue !== undefined) {
           newValue = filteredValue;
         }
@@ -96,7 +96,7 @@ bit155.attr = function(options) {
       }
       
       if (callback) {
-        callback.apply(this, [newValue, oldValue]);
+        callback.call(this, newValue, oldValue);
       }
       
       return this;

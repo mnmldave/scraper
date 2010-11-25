@@ -103,40 +103,58 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
   }
 });
 
-function createPopupFunction(url) {
-  return function(info, tab) {
-    var active;
-  
-    // can't work on extensions pages
-    if (tab.url.indexOf("https://chrome.google.com/extensions") == 0 || tab.url.indexOf("chrome://") == 0) {
-      alert("Scraper is not permitted to work on the Google Chrome extensions page for security reasons.");
-      return;
-    }
-  
-    chrome.tabs.sendRequest(tab.id, { command: 'scraperSelect' }, function(response) {
-      active = true;
-      chrome.windows.create({ 
-        url: chrome.extension.getURL(url) 
-          + "?tab=" + tab.id
-          + "&options=" + encodeURIComponent(JSON.stringify(response)),
-        type: 'popup',
-        width: Math.max(650, parseInt((localStorage['viewer.width'] || '960'), 10)),
-        height: Math.max(250, parseInt((localStorage['viewer.height'] || '400'), 10))
-      });
-    });
-  
-    // offer to reload page if scraping didn't work
-    setTimeout(function() {
-      if (!active && confirm('You need to reload this page before you can use Scraper. Press ok if you would like to reload it now, or cancel if not.')) {
-        chrome.tabs.update(tab.id, {url: "javascript:window.location.reload()"});
-      }
-    }, 500);
-  };
+// make some default presets
+if (!bit155.scraper.presets()) {
+  bit155.scraper.presets([
+	  { 
+	    name: 'Paragraph Text', 
+	    options: {
+	      language: 'xpath',
+	      selector: '//p',
+	      attributes: [
+	        { xpath: '.', name: 'Text' }
+	      ],
+	      filters: [ 'empty' ]
+	    }
+	  },
+	  { 
+	    name: 'Links', 
+	    options: {
+	      language: 'xpath',
+	      selector: '//a',
+	      attributes: [
+	        { xpath: '.', name: 'Link' },
+	        { xpath: '@href', name: 'URL' }
+	      ],
+	      filters: ['empty']
+	    }
+	  }
+	]);
 };
 
 // context menus
 var scrapeSimilarItem = chrome.contextMenus.create({
   title: "Scrape similar...",
   contexts: ['all'],
-  onclick: createPopupFunction('viewer.html')
+  onclick: function(info, tab) {
+    var active = false;
+
+    // get selection options and open viewer with those
+    chrome.tabs.sendRequest(tab.id, { command: 'scraperSelectionOptions' }, function(response) {
+      active = true;
+      bit155.scraper.viewer(tab, response);
+    });
+    
+    // reload page if no response
+    setTimeout(function() {
+      if (!active && confirm('You need to reload this page before you can use Scraper. Press ok if you would like to reload it now, or cancel if not.')) {
+        chrome.tabs.update(tab.id, {url: "javascript:window.location.reload()"});
+      }
+    }, 500);
+  }
 });
+
+// browser action
+chrome.browserAction.setIcon({ path: chrome.extension.getURL('img/scraper19.png') });
+chrome.browserAction.setPopup({ popup: 'popup.html' });
+chrome.browserAction.setTitle({ title: 'Scraper' });

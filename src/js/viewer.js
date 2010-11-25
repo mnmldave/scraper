@@ -59,46 +59,36 @@ Viewer.prototype.tabId = bit155.attr({
 });
 
 /**
- * Contains an array of preset objects, where each object has a String 'name'
- * property, and an Object 'options' property.
+ * Reloads data of elements dependent on bit155.scraper.presets data.
  */
-Viewer.prototype.presetList = bit155.attr({
-  filter: function(v) {
-    if (v && !$.isArray(v)) {
-      throw new Error('Presets must be in an array.');
-    }
-    return v;
-  },
-  callback: function(presets) {
-    var list;
-    var self = this;
+Viewer.prototype.reloadPresets = function() {
+  var list;
+  var self = this;
+  var presets = bit155.scraper.presets();
+  
+  // update list
+	list = $('#presets-list');
+	list.empty();
+  $.each(presets || [], function(i, preset) {
+    var handle = $('<img class="preset-handle" src="img/application-form.png">');
+    var load = $('<a class="preset-load" href="javascript:;" title="Load this preset.">').text(preset.name).click(function() {
+      self.options(preset.options);
+      $('#presets-form-name').val(preset.name);
+      $('#presets').dialog('close');
+      self.scrape();
+      return false;
+    });
+    var remove = $('<a class="preset-remove" href="javascript:;" title="Remove this preset.">').append($('<img src="img/bullet_delete.png" title="Remove preset.">')).click(function() {
+      if (confirm('Are you sure you want to remove the preset, "' + preset.name + '"?')) {
+        presets.splice(i,1);
+        bit155.scraper.presets(presets);
+        self.reloadPresets();
+      }
+    });
     
-    // save to local storage
-    localStorage['viewer.presets'] = presets ? JSON.stringify(presets) : null;
-
-    // update list
-  	list = $('#presets-list');
-  	list.empty();
-    $.each(presets || [], function(i, preset) {
-      var handle = $('<img class="preset-handle" src="img/application-form.png">');
-      var load = $('<a class="preset-load" href="javascript:;" title="Load this preset.">').text(preset.name).click(function() {
-        self.options(preset.options);
-        $('#presets-form-name').val(preset.name);
-        $('#presets').dialog('close');
-        self.scrape();
-        return false;
-      });
-      var remove = $('<a class="preset-remove" href="javascript:;" title="Remove this preset.">').append($('<img src="img/bullet_delete.png" title="Remove preset.">')).click(function() {
-        if (confirm('Are you sure you want to remove the preset, "' + preset.name + '"?')) {
-          presets.splice(i,1);
-          self.presetList(presets); 
-        }
-      });
-      
-      list.append($('<li>').attr('id', 'preset-' + i).append(handle).append(load).append(remove));
-  	});
-  }
-});
+    list.append($('<li>').attr('id', 'preset-' + i).append(handle).append(load).append(remove));
+  });
+};
 
 /**
  * Returns the current options (as encapsulated by the form) or sets new 
@@ -398,7 +388,7 @@ $(function() {
     animated: false
 	});
 	$('#center').tabs();
-	
+  
 	// bind buttons to viewer
 	$('#options').submit(function() { viewer.scrape(); return false; });
   $('#export').submit(function() { viewer.spreadsheet(); return false; });
@@ -413,14 +403,17 @@ $(function() {
 	// update title whenever tab changes
 	var updateMeta = function(tab) {
 	  document.title = "Scraper - " + tab.title;
+
 	  $('#options-meta-page').empty().append($('<a>').attr('href', tab.url).text(tab.title).click(function() {
 	    chrome.tabs.update(viewer.tabId(), { selected: true });
 	    return false;
 	  }));
+	  
+    // resize content since the header height may change and this buggers up
+    // the footer
+	  layout.resizeContent('west');
 	};
-	chrome.tabs.get(viewer.tabId(), function(tab) { 
-	  updateMeta(tab);
-	});
+	chrome.tabs.get(viewer.tabId(), updateMeta);
 	chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 	  if (tabId === viewer.tabId()) {
 	    updateMeta(tab);
@@ -470,7 +463,7 @@ $(function() {
 	});
 	$('#presets-form').submit(function() {
 	  var preset = {};
-	  var presetList = viewer.presetList();
+	  var presetList = bit155.scraper.presets();
 	  var presetForm = $(this).serializeParams();
 	  var options = viewer.options();
 	  var i;
@@ -480,6 +473,7 @@ $(function() {
 	    viewer.error('You must specify a name for the preset.');
 	    return false;
 	  }
+	  
 	  for (i = 0; i < presetList.length; i++) {
 	    if (presetList[i].name === presetForm.name) {
 	      if (!confirm('There is already a preset with the name "' + presetForm.name + '". Do you want to overwrite the existing preset?')) {
@@ -499,7 +493,8 @@ $(function() {
 	  // remove existing presets with the same name, append new preset, and save
 	  presetList = presetList.filter(function(p) { return p.name !== preset.name; });
 	  presetList.unshift(preset);
-	  viewer.presetList(presetList);
+	  bit155.scraper.presets(presetList);
+	  viewer.reloadPresets();
 	  
 	  return false;
 	});
@@ -509,7 +504,7 @@ $(function() {
 	    var presetList = [];
 	    
 	    // map existing presets to identifier strings
-	    $.each(viewer.presetList(), function(i, p) {
+	    $.each(bit155.scraper.presets(), function(i, p) {
 	      presetMap['preset-' + i] = p;
 	    });
 	    
@@ -518,34 +513,11 @@ $(function() {
 	      presetList.push(presetMap[id]);
 	    });
 	    
-	    viewer.presetList(presetList);
+	    bit155.scraper.presets(presetList);
+	    viewer.reloadPresets();
 	  }
 	});
-	viewer.presetList(JSON.parse(localStorage['viewer.presets'] || JSON.stringify([
-	  { 
-	    name: 'Paragraph Text', 
-	    options: {
-	      language: 'xpath',
-	      selector: '//p',
-	      attributes: [
-	        { xpath: '.', name: 'Text' }
-	      ],
-	      filters: [ 'empty' ]
-	    }
-	  },
-	  { 
-	    name: 'Links', 
-	    options: {
-	      language: 'xpath',
-	      selector: '//a',
-	      attributes: [
-	        { xpath: '.', name: 'Link' },
-	        { xpath: '@href', name: 'URL' }
-	      ],
-	      filters: ['empty']
-	    }
-	  }
-	])));
+	viewer.reloadPresets();
 	
 	// reset button
 	$('#options-reset-button').click(function() {

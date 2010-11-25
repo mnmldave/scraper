@@ -51,8 +51,8 @@
       if (command === 'scraperScrape') {
         // scrape
         response.result = bit155.scraper.scrape(response);
-      } else if (command === 'scraperSelect') {
-        // select
+      } else if (command === 'scraperSelectionOptions') {
+        // selection options
         (function(){
           var focusNode, anchorNode;
           var selection = window.getSelection();
@@ -81,6 +81,8 @@
         if (elements) {
           $.scrollTo(elements.filter(':visible').effect('highlight', {}, 'slow'));
         }
+      } else if (command === 'scraperPing') {
+        // ping
       } else {
         throw new Error('Unsupported request: ' + JSON.stringify(request));
       }

@@ -10,13 +10,20 @@
   },
   "background_page": "background.html",
 	"permissions": [ "tabs", "contextMenus", "http://*/*", "https://*/*", "unlimitedStorage" ],
+	"browser_action": {
+    "default_icon": "img/scraper19.png",
+    "default_title": "Scraper",
+    "default_popup": "popup.html"
+  },
 	"content_scripts": [{
     "matches": [ "http://*/*", "https://*/*" ],
+    "run_at": "document_start",
     "js": [
       "lib/jquery-ui-1.8.6/js/jquery-1.4.2.js", 
       "lib/jquery-ui-1.8.6/js/jquery-ui-1.8.6.js", 
       "lib/jquery.scrollTo.js",
       "js/shared.js",
+      "js/bit155/attr.js",
       "js/bit155/scraper.js",
       "js/contentscript.js"
     ]

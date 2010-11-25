@@ -38,6 +38,61 @@ var bit155 = bit155 || {};
 bit155.scraper = bit155.scraper || {};
 
 /**
+ * Function that creates a new viewer window bound to the specified tab.
+ *
+ * @param {Object} tab (optional) the tab object to bind the viewer to 
+ *        (defaults to the currently selected tab)
+ * @param {Object} options (optional) options to initialize viewer with
+ */
+bit155.scraper.viewer = function(tab, options) {
+  options = options || {};
+  
+  // call this again with selected tab if none specified
+  if (!tab) {
+    chrome.tabs.getSelected(undefined, function(tab) {
+      if (tab) {
+        bit155.scraper.viewer(tab, options);
+      }
+    });
+    return;
+  }
+
+  // can't work on extensions pages
+  if (tab.url.indexOf("https://chrome.google.com/extensions") == 0 || tab.url.indexOf("chrome://") == 0) {
+    alert("Scraper is not permitted to work on the Google Chrome extensions page for security reasons.");
+    return;
+  }
+  
+  // open window if we get a ping response
+  chrome.windows.create({ 
+    url: chrome.extension.getURL('viewer.html') 
+      + "?tab=" + tab.id
+      + "&options=" + encodeURIComponent(JSON.stringify(options)),
+    type: 'popup',
+    width: Math.max(650, parseInt((localStorage['viewer.width'] || '960'), 10)),
+    height: Math.max(250, parseInt((localStorage['viewer.height'] || '400'), 10))
+  });
+};
+
+/**
+ * Contains presets, backed by localStorage['presets']. Contains migration
+ * from the old localStorage['viewer.presets'] since this attribute has 
+ * larger scope than just the viewer.
+ */
+bit155.scraper.presets = bit155.attr({
+  initial: JSON.parse(localStorage['presets'] || localStorage['viewer.presets'] || '[]'),
+  filter: function(v) {
+    if (v && !$.isArray(v)) {
+      throw new Error('Preset must be an array.');
+    }
+    return v;
+  },
+  callback: function(v) {
+    localStorage['presets'] = v ? JSON.stringify(v) : null;
+  }
+});
+
+/**
  * Generates an xpath that is specific, but hopefully not too specific, for
  * a node.
  *

@@ -1,0 +1,60 @@
+html {
+  width: 300px;
+}
+
+body {
+  font-family: "Lucida Grande",Arial,sans-serif;
+  font-size: 10px;
+  margin: 10px;
+  padding: 0;
+}
+
+a {
+  color: #333;
+}
+
+#scraper {
+  font-size: 14px;
+  padding: 0 10px;
+  display: block;
+  text-decoration: none;
+  margin-bottom: 5px;
+  cursor: pointer;
+  text-shadow: 0 0 1px #fff;
+}
+
+#scraper:hover {
+  text-decoration: underline;
+}
+
+#presets {
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+}
+
+  #presets li {
+    list-style: none;
+    margin: 0;
+  }
+  
+  #presets li a {
+    color: #333;
+    display: block;
+    text-decoration: none;
+    padding: 10px;
+    padding-left: 31px;
+    background-image: url('../img/application-form.png');
+    background-repeat: no-repeat;
+    background-position: 10px;
+  }
+  
+  #presets li a:focus {
+    outline: none;
+  }
+  
+  #presets li:hover {
+    background-color: #eee;
+    text-decoration: underline;
+  }
+  
