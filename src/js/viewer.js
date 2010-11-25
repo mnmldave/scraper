@@ -320,6 +320,13 @@ Viewer.prototype.spreadsheet = function() {
   chrome.tabs.get(self.tabId(), function(tab) {
     var request = {};
     var dialog = $('<div>').addClass('progress');
+    var title = tab.title;
+    
+    // ask user for title
+    title = prompt('Please enter a title for your Google spreadsheet:', title);
+    if (!title) {
+      return;
+    }
     
     // tell user to wait
     dialog.append($('<div style="margin: 30px; text-align: center"><img src="img/progress.gif"></div>'));
@@ -334,7 +341,7 @@ Viewer.prototype.spreadsheet = function() {
     // send spreadsheet request to background.js
     request.command = 'scraperSpreadsheet';
     request.payload = {
-      title: tab.title || 'Scraped Data',
+      title: title,
       csv: csv
     };
     chrome.extension.sendRequest(request, function(response) {
