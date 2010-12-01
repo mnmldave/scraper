@@ -1,3 +1,5 @@
+@import url('base.css');
+
 body {
   font-family: "Lucida Grande",Arial,sans-serif;
   font-size: 10px;
@@ -9,32 +11,6 @@ a:focus {
   outline: none;
 }
 
-a.button, button, input[type=submit] {
-  outline: none;
-  border: 1px solid #aaa;
-  padding: 7px 10px;
-  border-radius: 5px;    
-  background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#ddd));
-  color: #333;
-  text-shadow: 0 1px rgba(255,255,255,0.8);
-  text-decoration: none;
-  font-size: 11px;
-}
-
-a.button:active, button:active, input[type=submit]:active {
-  background: -webkit-gradient(linear, left top, left bottom, from(#ddd), to(#eee));
-}
-
-a.button:focus, button:focus, input[type=submit]:focus {
-  border-color: #999;
-  -webkit-box-shadow: 0 0 3px rgba(0,0,0,0.3);
-}
-
-select {
-  border: 1px solid #aaa;
-  padding: 3px;
-}
-
 div.error.ui-dialog-content.ui-widget-content {
   padding-left: 40px;
   background-repeat: no-repeat;
@@ -44,12 +20,11 @@ div.error.ui-dialog-content.ui-widget-content {
 
 #presets {
   display: none;
+  padding-top: 10px;
 }
 
   #presets-form {
     padding-bottom: 15px;
-    margin-bottom: 10px;
-    border-bottom: 1px solid #aaa;
   }
   
     #presets-form fieldset {
@@ -97,22 +72,21 @@ div.error.ui-dialog-content.ui-widget-content {
       }
     
       #presets-list li .preset-handle {
-        position: absolute;
-        left: 16px;
         cursor: move;
+        display: block;
+        float: left;
       }
       
       #presets-list li .preset-load {
         cursor: pointer;
         display: inline-block;
-        vertical-align: middle;
-        min-height: 16px;
-        cursor: pointer;
-        margin-left: 21px;
-        margin-right: 21px;
+        margin-top: 2px;
+        margin-left: 10px;
+        margin-right: 10px;
       }
     
       #presets-list li .preset-remove {
+        display: inline-block;
         position: absolute;
         right: 16px;
       }

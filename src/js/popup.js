@@ -35,17 +35,23 @@
  */
 
 $(function() {
-  var presetList = $('#presets');
+  var 
+    presets = bit155.scraper.presets(),
+    presetList = $('#presets');
 
-  $('#scraper').click(function() {
+  $('.viewer').click(function() {
     bit155.scraper.viewer();
     return false;
   });
   
-  $.each(bit155.scraper.presets(), function(index, preset) {
-    presetList.append($('<li class="preset">').append($('<a href="javascript:;">').text(preset.name).click(function() {
-      bit155.scraper.viewer(null, preset.options);
-      return false;
-    })));
-  });
+  if (presets.length === 0) {
+    presetList.append($('<li class="disabled">').text("No presets have been defined yet."));
+  } else {
+    $.each(presets, function(index, preset) {
+      presetList.append($('<li class="preset">').append($('<a href="javascript:;">').text(preset.name).click(function() {
+        bit155.scraper.viewer(null, preset.options);
+        return false;
+      })));
+    });
+  }
 });
