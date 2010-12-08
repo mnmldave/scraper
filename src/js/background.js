@@ -73,7 +73,7 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
         if (xhr.status == 401) {
           // unauthorized, token probably bad so clear it
           oauth.clearTokens();
-          sendResponse({error: 'Unauthorized. Please try again.'});
+          sendResponse({error: 'Google authentication failed. Please try exporting again, and you will be re-authenticated.'});
         } else {
           try {
             var json = JSON.parse(response);

@@ -12,6 +12,7 @@ body {
 #presets {
   margin: 0;
   overflow: auto;
+  max-height: 300px;
 }
 
   #presets li {

@@ -86,7 +86,7 @@ Viewer.prototype.reloadPresets = function() {
       }
     });
     
-    list.append($('<li>').attr('id', 'preset-' + i).append(handle).append(load).append(remove));
+    list.append($('<li>').attr('id', 'preset-' + i).append(handle).append(remove).append(load));
   });
 };
 
@@ -315,10 +315,10 @@ Viewer.prototype.spreadsheet = function() {
     var title = tab.title;
     
     // ask user for title
-    title = prompt('Please enter a title for your Google spreadsheet:', title);
-    if (!title) {
-      return;
-    }
+    // title = prompt('Please enter a title for your Google spreadsheet:', title);
+    //     if (!title) {
+    //       return;
+    //     }
     
     // tell user to wait
     dialog.append($('<div style="margin: 30px; text-align: center"><img src="img/progress.gif"></div>'));

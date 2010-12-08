@@ -79,10 +79,11 @@ div.error.ui-dialog-content.ui-widget-content {
       
       #presets-list li .preset-load {
         cursor: pointer;
-        display: inline-block;
+        display: block;
         margin-top: 2px;
-        margin-left: 10px;
-        margin-right: 10px;
+        margin-left: 26px;
+        margin-right: 26px;
+        line-height: 1.5;
       }
     
       #presets-list li .preset-remove {
@@ -315,14 +316,28 @@ div.error.ui-dialog-content.ui-widget-content {
 
   #about h1 {
     margin: 0;
+    font-size: 200%;
+    font-weight: normal;
+    margin-bottom: 0.2em;
   }
 
   #about h2 {
     font-size: 100%;
+    margin-bottom: 2em;
   }
   
   #about dl {
     margin-top: 2em;
+  }
+  
+  #about dl dt {
+    font-weight: bold;
+    margin-bottom: 0.5em;
+  }
+  
+  #about dl dd {
+    padding-left: 1em;
+    margin-bottom: 0.5em;
   }
   
 .pane-footer {
