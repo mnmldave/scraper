@@ -210,11 +210,6 @@ Viewer.prototype.reload = function() {
   var results = data.result || [];
   var attributes = data.attributes || [];
 
-  // error
-  if (data.error) {
-    this.error(data.error);
-  }
-
   // headers
   var thead = $('<thead>');
   var headerRow = $('<tr>').appendTo(thead).append('<th>&nbsp;</th>').append('<th>&nbsp;</th>');
@@ -289,6 +284,9 @@ Viewer.prototype.scrape = function() {
   };
   
   chrome.extension.sendRequest(request, function(response) { 
+    if (response.error) {
+      self.error(response.error);
+    }
     self.data(response); 
   });
 };
