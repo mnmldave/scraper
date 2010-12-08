@@ -288,7 +288,9 @@ Viewer.prototype.scrape = function() {
     }
   };
   
-  chrome.extension.sendRequest(request, function(response) { self.data(response); });
+  chrome.extension.sendRequest(request, function(response) { 
+    self.data(response); 
+  });
 };
 
 /**
@@ -336,6 +338,9 @@ Viewer.prototype.spreadsheet = function() {
     };
     chrome.extension.sendRequest(request, function(response) {
       dialog.dialog('close');
+      if (response.error) {
+        self.error(response.error);
+      }
     });
   });
 };
