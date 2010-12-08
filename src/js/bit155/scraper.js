@@ -144,10 +144,17 @@ bit155.scraper.optionsForSelection = function(focusNode, anchorNode) {
     ancestor = $(focusNode).closest('*');
   }
   
-  // if ancestor is a table (or tbody, thead or tfoot), assume user was 
-  // trying to capture the rows of the table.
-  if (ancestor.get(0) && (ancestor.get(0).tagName === 'TABLE' || ancestor.get(0).tagName === 'TBODY' || ancestor.get(0).tagName === 'THEAD' || ancestor.get(0).tagName === 'TFOOT')) {
-    ancestor = $(focusNode).closest('tr');
+  // tweak ancestor for some types of elements
+  // XXX design
+  if (ancestor && ancestor.length > 0) {
+    ancestorTagName = ancestor.get(0).tagName.toLowerCase();
+    if (ancestorTagName === 'table' || ancestorTagName === 'tbody' || ancestorTagName === 'thead' || ancestorTagName === 'tfoot') {
+      // table? select rows instead
+      ancestor = $(focusNode).closest('tr');
+    } else if (ancestorTagName === 'dl') {
+      // dl? select terms instead
+      ancestor = ancestor.find('dt').first();
+    }
   }
   
   // populate options
@@ -210,6 +217,9 @@ bit155.scraper.optionsForSelection = function(focusNode, anchorNode) {
     } else if (ancestorTagName === 'img') {
       options.attributes.push({ xpath: '@title', name: 'Title' });
       options.attributes.push({ xpath: '@src', name: 'Source' });
+    } else if (ancestorTagName === 'dt') {
+      options.attributes.push({ xpath: '.', name: 'Term' });
+      options.attributes.push({ xpath: './following-sibling::dd', name: 'Definition' });
     } else {
       options.attributes.push({ xpath: '.', name: 'Text' });
     }
