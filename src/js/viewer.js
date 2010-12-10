@@ -571,6 +571,10 @@ $(function() {
   // give selectorinput focus
   $('#options-selector').select().focus();
   
+  setTimeout(function() {
+    layout.resizeAll();
+  }, 100);
+  
   // if error, wait a moment to show it
   if (options.error) {
     setTimeout(function() {
