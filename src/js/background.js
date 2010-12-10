@@ -73,8 +73,6 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
       };
       var url = 'https://docs.google.com/feeds/default/private/full';
       
-      console.log(request);
-      
       var callback = function(response, xhr) {
         if (xhr.status == 401) {
           // unauthorized, token probably bad so clear it
@@ -165,8 +163,3 @@ var scrapeSimilarItem = chrome.contextMenus.create({
     }, 500);
   }
 });
-
-// browser action
-chrome.browserAction.setIcon({ path: chrome.extension.getURL('img/scraper19.png') });
-chrome.browserAction.setPopup({ popup: 'popup.html' });
-chrome.browserAction.setTitle({ title: 'Scraper' });

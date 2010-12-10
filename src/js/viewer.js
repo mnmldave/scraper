@@ -190,7 +190,6 @@ Viewer.prototype.addAttribute = function(xpath, name, context) {
  *        string, to display
  */
 Viewer.prototype.error = function(error) {
-  console.log(error);
   $('<div class="error">').text(error.message ? error.message : '' + error).dialog({
     title: 'Error',
     modal: true,

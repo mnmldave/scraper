@@ -79,7 +79,8 @@
         }
 
         if (elements) {
-          $.scrollTo(elements.filter(':visible').effect('highlight', {}, 'slow'));
+          window.scrollTo(elements.offset().left, elements.offset().top);
+          elements.filter(':visible').effect('highlight', {}, 'slow');
         }
       } else if (command === 'scraperPing') {
         // ping

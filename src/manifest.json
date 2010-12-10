@@ -15,8 +15,7 @@
     "run_at": "document_start",
     "js": [
       "lib/jquery-ui-1.8.6/js/jquery-1.4.2.js", 
-      "lib/jquery-ui-1.8.6/js/jquery-ui-1.8.6.js", 
-      "lib/jquery.scrollTo.js",
+      "lib/jquery-ui-1.8.6/js/jquery-ui-1.8.6.highlight.js", 
       "js/shared.js",
       "js/bit155/attr.js",
       "js/bit155/scraper.js",
