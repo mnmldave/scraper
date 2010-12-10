@@ -55,26 +55,32 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
   } else if (command === 'scraperSpreadsheet') {
     // export spreadsheet to google docs
     oauth.authorize(function() {
-      var url = 'https://docs.google.com/feeds/default/private/full';
+      // remove trailing colons from slug as this will result in error due to
+      // http://code.google.com/a/google.com/p/apps-api-issues/issues/detail?id=2136
+      var title = payload.title || '';
+      var slug = encodeURIComponent(title.replace(/[:]+\s*$/,''));
       var request = {
         'method': 'POST',
         'headers': {
           'GData-Version': '3.0',
           'Content-Type': 'text/csv',
-          'Slug': payload.title
+          'Slug': slug
         },
         'parameters': {
           'alt': 'json'
         },
         'body': payload.csv
       };
+      var url = 'https://docs.google.com/feeds/default/private/full';
+      
+      console.log(request);
       
       var callback = function(response, xhr) {
         if (xhr.status == 401) {
           // unauthorized, token probably bad so clear it
           oauth.clearTokens();
           sendResponse({error: 'Google authentication failed. Please try exporting again, and you will be re-authenticated.'});
-        } else {
+        } else if (xhr.status - 200 < 100) {
           try {
             var json = JSON.parse(response);
         
@@ -93,8 +99,14 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
             // forward response to the caller
             sendResponse(json);
           } catch (error) {
-            sendResponse({error:error});
+            sendResponse({
+              error: error
+            });
           }
+        } else {
+          sendResponse({
+            error: 'Received an unexpected response.\n\n' + response
+          });
         }
       };
       

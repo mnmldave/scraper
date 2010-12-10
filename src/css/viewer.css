@@ -11,6 +11,10 @@ a:focus {
   outline: none;
 }
 
+div.error {
+  line-height: 1.5;
+}
+
 div.error.ui-dialog-content.ui-widget-content {
   padding-left: 40px;
   background-repeat: no-repeat;
