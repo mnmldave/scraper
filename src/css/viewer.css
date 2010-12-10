@@ -288,6 +288,10 @@ div.error.ui-dialog-content.ui-widget-content {
   #results-table table td {
     padding: 5px;
   }
+  
+  #results-table td.tools, #results-table td.index {
+    width: 10px;
+  }
 
   #results-table table td.tools img {
     margin-right: 2px;

@@ -228,7 +228,7 @@ Viewer.prototype.reload = function() {
     }));
     
     // index
-    row.append($('<td>').text(i + 1));
+    row.append($('<td class="index" nowrap>').text(i + 1));
     
     // attributes
     $.each(attributes, function(j,attribute) {
