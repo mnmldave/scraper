@@ -345,6 +345,10 @@ div.error.ui-dialog-content.ui-widget-content {
     margin-bottom: 0.5em;
   }
   
+  #about a {
+    text-decoration: underline;
+  }
+  
 .pane-footer {
   height: 30px;
   border-top: 1px solid #fff !important;

@@ -99,11 +99,12 @@ bit155.scraper.presets = bit155.attr({
  * @param {Object} node to generate xpath for
  */
 bit155.scraper.xpathForNode = function(node) {
-  var xpath = $(node).xpath();
-  var xpathLastPredicateRegex = /^(.*)(\[\d+\])([^\[\]]*)$/;
-  var xpathFirstSegmentRegex = /^(\/+[^\/]+)(.*)$/;
-  var result;
-  var selection;
+  var xpath = $(node).xpath(),
+      xpathLastPredicateRegex = /^(.*)(\[\d+\])([^\[\]]*)$/,
+      xpathFirstSegmentRegex = /^(\/+[^\/]+)(.*)$/,
+      result,
+      selection,
+      selectionTrimmed;
   
   // keep cutting out the last predicate until we match more than one node
   // and consider this our ideal selection
@@ -115,10 +116,15 @@ bit155.scraper.xpathForNode = function(node) {
     xpath = result[1] + result[3];
   }
   
+  if (!selection) {
+    return xpath;
+  }
+  
   // trim the front of the path until we have smallest xpath that returns
   // same number of elements
   while ((result = xpathFirstSegmentRegex.exec(xpath))) {
-    if (bit155.scraper.select(document, '/' + result[2], 'xpath').length !== selection.length) {
+    selectionTrimmed = bit155.scraper.select(document, '/' + result[2], 'xpath') || [];
+    if (selectionTrimmed.length !== selection.length) {
       break;
     }
     xpath = '/' + result[2];
@@ -133,9 +139,16 @@ bit155.scraper.xpathForNode = function(node) {
  *
  * @param {Object} focusNode same semantics as Selection.focusNode
  * @param {Object} anchorNode (optional) same as Selection.anchorNode
+ * @param {HTMLDocument} doc the document in which to match
  */
-bit155.scraper.optionsForSelection = function(focusNode, anchorNode) {
-  var options = {}, ancestor, ancestorTagName, ancestorClassName, node;
+bit155.scraper.optionsForSelection = function(focusNode, anchorNode, doc) {
+  var options = {}, 
+      ancestor, 
+      ancestorTagName, 
+      ancestorClassName, 
+      node;
+
+  doc = doc || window.document;
   
   // determine common ancestor based on user's current selection
   if (anchorNode) {

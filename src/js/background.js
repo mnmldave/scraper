@@ -149,13 +149,13 @@ var scrapeSimilarItem = chrome.contextMenus.create({
   onclick: function(info, tab) {
     var active = false;
 
-    // get selection options and open viewer with those
+    // get selection options and open viewer with the response
     chrome.tabs.sendRequest(tab.id, { command: 'scraperSelectionOptions' }, function(response) {
       active = true;
       bit155.scraper.viewer(tab, response);
     });
     
-    // reload page if no response
+    // offer to reload page if no response
     setTimeout(function() {
       if (!active && confirm('You need to reload this page before you can use Scraper. Press ok if you would like to reload it now, or cancel if not.')) {
         chrome.tabs.update(tab.id, {url: "javascript:window.location.reload()"});

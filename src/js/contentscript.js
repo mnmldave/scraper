@@ -11,16 +11,16 @@
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  * 
- *     * Redistributions of source code must retain the above copyright notice,
- *       this list of conditions and the following disclaimer.
+ *     * Redistributions of source code must retain the above copyright 
+ * notice, this list of conditions and the following disclaimer.
  *  
  *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
  *  
- *      * Neither the name of bit155 nor the names of its contributors
- *        may be used to endorse or promote products derived from this software
- *        without specific prior written permission.
+ *     * Neither the name of bit155 nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
+ * without specific prior written permission.
  *  
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -43,9 +43,9 @@
   
   // listen for requests
   chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
-    var command = request.command;
-    var payload = request.payload;
-    var response = $.extend({}, payload);
+    var command = request.command,
+        payload = request.payload,
+        response = $.extend({}, payload);
 
     try {
       if (command === 'scraperScrape') {
@@ -54,34 +54,54 @@
       } else if (command === 'scraperSelectionOptions') {
         // selection options
         (function(){
-          var focusNode, anchorNode;
-          var selection = window.getSelection();
-
+          var focusNode,
+              anchorNode, 
+              selectionDocument,
+              selection;
+              
+          // abort if no contextNode as probably being invoked from another
+          // frame
+          if (!contextNode) {
+            response.error = "Frames are not supported at the moment. Please open the frame in a new tab or window and try scraping again.";
+            return;
+          }
+          
+          // determine range of selection
+          selection = window.getSelection();
+          selectionDocument = window.document;
           if (selection.isCollapsed) {
+            // nothing selected, so use whatever node is under the cursor
             focusNode = contextNode;
           } else {
+            // select focus and anchor nodes from selection
             focusNode = selection.focusNode;
             anchorNode = selection.anchorNode;
           }
-
-          response = $.extend(response, bit155.scraper.optionsForSelection(focusNode, anchorNode));
+          
+          // clear context node
+          contextNode = null;
+          
+          // extend response with options generated from current selection
+          response = $.extend(response, bit155.scraper.optionsForSelection(focusNode, anchorNode, selectionDocument));
         }());
       } else if (command === 'scraperHighlight') {
         // highlight
-        var elements;
+        (function() {
+          var elements;
 
-        if (payload.selector) {
-          elements = bit155.scraper.select(document, payload.selector, payload.language);
-        } else if (payload.xpath) {
-          elements = bit155.scraper.select(document, payload.xpath, 'xpath');
-        } else if (payload.jquery) {
-          elements = $(payload.jquery);
-        }
+          if (payload.selector) {
+            elements = bit155.scraper.select(document, payload.selector, payload.language);
+          } else if (payload.xpath) {
+            elements = bit155.scraper.select(document, payload.xpath, 'xpath');
+          } else if (payload.jquery) {
+            elements = $(payload.jquery);
+          }
 
-        if (elements) {
-          window.scrollTo(elements.offset().left, elements.offset().top);
-          elements.filter(':visible').effect('highlight', {}, 'slow');
-        }
+          if (elements) {
+            window.scrollTo(elements.offset().left, elements.offset().top);
+            elements.filter(':visible').effect('highlight', {}, 'slow');
+          }          
+        }());
       } else if (command === 'scraperPing') {
         // ping
       } else {

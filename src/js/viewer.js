@@ -67,8 +67,8 @@ Viewer.prototype.reloadPresets = function() {
   var presets = bit155.scraper.presets();
   
   // update list
-	list = $('#presets-list');
-	list.empty();
+  list = $('#presets-list');
+  list.empty();
   $.each(presets || [], function(i, preset) {
     var handle = $('<img class="preset-handle" src="img/application-form.png">');
     var load = $('<a class="preset-load" href="javascript:;" title="Load this preset.">').text(preset.name).click(function() {
@@ -346,26 +346,25 @@ Viewer.prototype.spreadsheet = function() {
 function parseQueryString(_1){var _2={};if(_1==undefined){_1=location.search?location.search:"";}if(_1.charAt(0)=="?"){_1=_1.substring(1);}_1=_1.replace(/\+/g," ");var _3=_1.split(/[&;]/g);for(var i=0;i<_3.length;i++){var _5=_3[i].split("=");var _6=decodeURIComponent(_5[0]);var _7=decodeURIComponent(_5[1]);if(!_2[_6]){_2[_6]=[];}_2[_6].push((_5.length==1)?"":_7);}return _2;}
 
 $(function() {
-  var query = parseQueryString();
-	var queryTabId = query.tab && query.tab.length > 0 ? parseInt(query.tab[0], 10) : -1;
-	var queryOptions = query.options && query.options.length > 0 ? JSON.parse(query.options[0]) : {};
-	var savedOptions = JSON.parse(localStorage['viewer.options'] || JSON.stringify({
-	  selector: 'a',
-	  language: 'jquery',
-	  attributes: [
-	    { xpath: '.', name: 'Link' },
-	    { xpath: '@href', name: 'URL' }
-	  ],
-	  filters: [
-	    'empty'
-	  ]
-	}));
-	var originalOptions = $.extend({}, savedOptions, queryOptions);
-	
-	// create viewer
+  var response = parseQueryString(),
+      responseOptions = response.options && response.options.length > 0 ? JSON.parse(response.options[0]) : {},
+      savedOptions = JSON.parse(localStorage['viewer.options'] || JSON.stringify({
+          selector: 'a',
+          language: 'jquery',
+          attributes: [
+            { xpath: '.', name: 'Link' },
+            { xpath: '@href', name: 'URL' }
+          ],
+          filters: [
+            'empty'
+          ]
+        })),
+      options = $.extend({}, savedOptions, responseOptions);
+  
+  // create viewer
   var viewer = new Viewer();
-  viewer.tabId(queryTabId);
-  viewer.options(originalOptions);
+  viewer.tabId(response.tab && response.tab.length > 0 ? parseInt(response.tab[0], 10) : -1);
+  viewer.options(options);
   
   // layout view
   var layout = $('body').layout({ 
@@ -388,45 +387,45 @@ $(function() {
     active: false,
     autoHeight: false,
     animated: false
-	});
-	$('#center').tabs();
+  });
+  $('#center').tabs();
   
-	// bind buttons to viewer
-	$('#options').submit(function() { viewer.scrape(); return false; });
+  // bind buttons to viewer
+  $('#options').submit(function() { viewer.scrape(); return false; });
   $('#export').submit(function() { viewer.spreadsheet(); return false; });
-	
-	// close the window when the tab is closed
-	chrome.tabs.onRemoved.addListener(function(tabId) {
-	  if (tabId == viewer.tabId()) {
-	    window.close();
-	  }
-	});
-	
-	// update title whenever tab changes
-	var updateMeta = function(tab) {
-	  document.title = "Scraper - " + tab.title;
+  
+  // close the window when the tab is closed
+  chrome.tabs.onRemoved.addListener(function(tabId) {
+    if (tabId == viewer.tabId()) {
+      window.close();
+    }
+  });
+  
+  // update title whenever tab changes
+  var updateMeta = function(tab) {
+    document.title = "Scraper - " + tab.title;
 
-	  $('#options-meta-page').empty().append($('<a>').attr('href', tab.url).text(tab.title).click(function() {
-	    chrome.tabs.update(viewer.tabId(), { selected: true });
-	    return false;
-	  }));
-	  
+    $('#options-meta-page').empty().append($('<a>').attr('href', tab.url).text(tab.title).click(function() {
+      chrome.tabs.update(viewer.tabId(), { selected: true });
+      return false;
+    }));
+    
     // resize content since the header height may change and this buggers up
     // the footer
-	  layout.resizeContent('west');
-	};
-	chrome.tabs.get(viewer.tabId(), updateMeta);
-	chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-	  if (tabId === viewer.tabId()) {
-	    updateMeta(tab);
-	  }
-	});
-	
-	// help dialog
-	$('#about').dialog({
-	  autoOpen: false,
-	  draggable: false,
-	  resizable: false,
+    layout.resizeContent('west');
+  };
+  chrome.tabs.get(viewer.tabId(), updateMeta);
+  chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+    if (tabId === viewer.tabId()) {
+      updateMeta(tab);
+    }
+  });
+  
+  // help dialog
+  $('#about').dialog({
+    autoOpen: false,
+    draggable: false,
+    resizable: false,
     title: 'About',
     width: 400,
     show: 'fade',
@@ -438,98 +437,98 @@ $(function() {
       click: function() { $(this).dialog("close"); }
     }]
   });
-	$('#about-link').click(function() {
-	  $('#about').dialog('open');
-	  return false;
-	});
-	
-	// presets
-	$('#presets').dialog({
-	  autoOpen: false,
-	  width: Math.max(100, parseInt(JSON.parse(localStorage['viewer.presets.width'] || '400'), 10)),
-	  height: Math.max(100, parseInt(JSON.parse(localStorage['viewer.presets.height'] || '300'), 10)),
-	  position: JSON.parse(localStorage['viewer.presets.position'] || '"center"'),
-	  modal: true,
-	  title: 'Presets',
-	  beforeClose: function() {
-	    var position = $(this).dialog('option', 'position');
-	    
-	    localStorage['viewer.presets.position'] = JSON.stringify([position[0], position[1]]);
+  $('#about-link').click(function() {
+    $('#about').dialog('open');
+    return false;
+  });
+  
+  // presets
+  $('#presets').dialog({
+    autoOpen: false,
+    width: Math.max(100, parseInt(JSON.parse(localStorage['viewer.presets.width'] || '400'), 10)),
+    height: Math.max(100, parseInt(JSON.parse(localStorage['viewer.presets.height'] || '300'), 10)),
+    position: JSON.parse(localStorage['viewer.presets.position'] || '"center"'),
+    modal: true,
+    title: 'Presets',
+    beforeClose: function() {
+      var position = $(this).dialog('option', 'position');
+      
+      localStorage['viewer.presets.position'] = JSON.stringify([position[0], position[1]]);
       localStorage['viewer.presets.width'] = $(this).dialog('option', 'width');
       localStorage['viewer.presets.height'] = $(this).dialog('option', 'height');
-	  }
-	});
-	$('#options-presets-button').click(function() {
+    }
+  });
+  $('#options-presets-button').click(function() {
     $('#presets').dialog('open');
-	  return false;
-	});
-	$('#presets-form').submit(function() {
-	  var preset = {};
-	  var presetList = bit155.scraper.presets();
-	  var presetForm = $(this).serializeParams();
-	  var options = viewer.options();
-	  var i;
-	  
-	  // make sure it's a unique name
-	  if ($.trim(presetForm.name || '') === '') {
-	    viewer.error('You must specify a name for the preset.');
-	    return false;
-	  }
-	  
-	  for (i = 0; i < presetList.length; i++) {
-	    if (presetList[i].name === presetForm.name) {
-	      if (!confirm('There is already a preset with the name "' + presetForm.name + '". Do you want to overwrite the existing preset?')) {
-	        return false;
+    return false;
+  });
+  $('#presets-form').submit(function() {
+    var preset = {};
+    var presetList = bit155.scraper.presets();
+    var presetForm = $(this).serializeParams();
+    var options = viewer.options();
+    var i;
+    
+    // make sure it's a unique name
+    if ($.trim(presetForm.name || '') === '') {
+      viewer.error('You must specify a name for the preset.');
+      return false;
+    }
+    
+    for (i = 0; i < presetList.length; i++) {
+      if (presetList[i].name === presetForm.name) {
+        if (!confirm('There is already a preset with the name "' + presetForm.name + '". Do you want to overwrite the existing preset?')) {
+          return false;
         }
-	    }
-	  }
-	  
-	  // configure preset
-	  preset.name = presetForm.name;
+      }
+    }
+    
+    // configure preset
+    preset.name = presetForm.name;
     preset.options = {};
     preset.options.language = options.language;
     preset.options.selector = options.selector;
     preset.options.attributes = $.extend(true, [], options.attributes);
     preset.options.filters = $.extend(true, [], options.filters);
-	  
-	  // remove existing presets with the same name, append new preset, and save
-	  presetList = presetList.filter(function(p) { return p.name !== preset.name; });
-	  presetList.unshift(preset);
-	  bit155.scraper.presets(presetList);
-	  viewer.reloadPresets();
-	  
-	  return false;
-	});
-	$('#presets-list').sortable({
-	  update: function(event, ui) {
-	    var presetMap = {};
-	    var presetList = [];
-	    
-	    // map existing presets to identifier strings
-	    $.each(bit155.scraper.presets(), function(i, p) {
-	      presetMap['preset-' + i] = p;
-	    });
-	    
-	    // reorder the preset list
-	    $.each($(this).sortable('toArray'), function(i, id) {
-	      presetList.push(presetMap[id]);
-	    });
-	    
-	    bit155.scraper.presets(presetList);
-	    viewer.reloadPresets();
-	  }
-	});
-	viewer.reloadPresets();
-	
-	// reset button
-	$('#options-reset-button').click(function() {
-	  if (confirm("Do you want to reset the options to their original values?")) {
-	    $('#presets-form-name').val('');
-	    viewer.options(originalOptions);
-	    viewer.scrape();
+    
+    // remove existing presets with the same name, append new preset, and save
+    presetList = presetList.filter(function(p) { return p.name !== preset.name; });
+    presetList.unshift(preset);
+    bit155.scraper.presets(presetList);
+    viewer.reloadPresets();
+    
+    return false;
+  });
+  $('#presets-list').sortable({
+    update: function(event, ui) {
+      var presetMap = {};
+      var presetList = [];
+      
+      // map existing presets to identifier strings
+      $.each(bit155.scraper.presets(), function(i, p) {
+        presetMap['preset-' + i] = p;
+      });
+      
+      // reorder the preset list
+      $.each($(this).sortable('toArray'), function(i, id) {
+        presetList.push(presetMap[id]);
+      });
+      
+      bit155.scraper.presets(presetList);
+      viewer.reloadPresets();
     }
-	  return false;
-	});
+  });
+  viewer.reloadPresets();
+  
+  // reset button
+  $('#options-reset-button').click(function() {
+    if (confirm("Do you want to reset the options to their original values?")) {
+      $('#presets-form-name').val('');
+      viewer.options(options);
+      viewer.scrape();
+    }
+    return false;
+  });
   
   // language
   $('#options-language').change(function() {
@@ -544,15 +543,15 @@ $(function() {
   $('#options-language').change();
   
   // initial scrape
-	viewer.scrape();
-	
-	// save dimensions upon resize
-	addEventListener('resize', function(event) {
+  viewer.scrape();
+  
+  // save dimensions upon resize
+  addEventListener('resize', function(event) {
     localStorage['viewer.width'] = window.outerWidth;
     localStorage['viewer.height'] = window.outerHeight;
-	});
-	
-	// save options on close
+  });
+  
+  // save options on close
   addEventListener("unload", function(event) {
     var options = viewer.options();
     if (!options.filters) {
@@ -563,7 +562,14 @@ $(function() {
     localStorage['viewer.west.closed'] = layout.state.west.isClosed;
   }, true);
   
-	// give selectorinput focus
-	$('#options-selector').select().focus();
+  // give selectorinput focus
+  $('#options-selector').select().focus();
+  
+  // if error, wait a moment to show it
+  if (options.error) {
+    setTimeout(function() {
+      viewer.error(options.error);
+    }, 500);
+  }
 });
 
