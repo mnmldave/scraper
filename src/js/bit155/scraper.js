@@ -80,7 +80,7 @@ bit155.scraper.viewer = function(tab, options) {
  * larger scope than just the viewer.
  */
 bit155.scraper.presets = bit155.attr({
-  initial: JSON.parse(localStorage['presets'] || localStorage['viewer.presets'] || '[]'),
+  initial: JSON.parse(localStorage['presets'] || localStorage['viewer.presets'] || 'null'),
   filter: function(v) {
     if (v && !$.isArray(v)) {
       throw new Error('Preset must be an array.');
