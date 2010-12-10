@@ -167,6 +167,9 @@ bit155.scraper.optionsForSelection = function(focusNode, anchorNode, doc) {
     } else if (ancestorTagName === 'dl') {
       // dl? select terms instead
       ancestor = ancestor.find('dt').first();
+    } else if (ancestorTagName === 'ul' || ancestorTagName === 'ol') {
+      // dl? select terms instead
+      ancestor = ancestor.find('li').first();
     }
   }
   

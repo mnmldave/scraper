@@ -255,7 +255,13 @@ Viewer.prototype.reload = function() {
       });
       
       return row;
-    }
+    },
+    'aoColumnDefs': [
+      { 
+        aTargets: [0],
+        bSortable: false
+      }
+    ]
   });
 };
 
